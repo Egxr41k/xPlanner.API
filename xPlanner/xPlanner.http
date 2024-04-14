@@ -1,0 +1,6 @@
+@xPlanner_HostAddress = http://localhost:5197
+
+GET {{xPlanner_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
