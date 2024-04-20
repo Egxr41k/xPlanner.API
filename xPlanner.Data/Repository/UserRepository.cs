@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Core;
 using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
@@ -12,40 +13,63 @@ public class UserRepository : IRepository<User>
         this.dbContext = dbContext;
     }
 
-    public async Task Add(User user)
+    public async Task Add(User user) // register
     {
-        if (user == null) return;
-        if (dbContext.Users.Contains(user)) return;
-
-        await dbContext.Users.AddAsync(user);
-        await dbContext.SaveChangesAsync();
+        try
+        {
+            User existed = await GetById(user.Id);
+        } 
+        catch (ObjectNotFoundException)
+        {
+            user.Id = dbContext.Users.Count();
+            user.CreatedAt = DateTime.UtcNow;
+            user.Name = user.Email;
+            await dbContext.Users.AddAsync(user);
+            await dbContext.SaveChangesAsync();
+        }
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(int id) // delete own profile 
     {
-        User? user = await dbContext.Users.FindAsync(id);
+        try
+        {
+            User user = await GetById(id);
 
-        if (user == null) return;
-        dbContext.Users.Remove(user);
-        await dbContext.SaveChangesAsync();
+            dbContext.Users.Remove(user);
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception) { throw; }
     }
 
-    public async Task<List<User>> GetAll()
+    public async Task<List<User>> GetAll() // get Top 
     {
         return await dbContext.Users.ToListAsync();
     }
 
-    public async Task<User> GetById(int id)
+    public async Task<User> GetById(int id) // view profile
     {
-        return await dbContext.Users.FindAsync(id) ?? new User();
+        return await dbContext.Users
+            .FirstOrDefaultAsync(user => user.Id == id) ??
+            throw new ObjectNotFoundException();
     }
 
-    public async Task Update(User user)
+    public async Task<User> GetByEmail(string email) // view profile
     {
-        if (user == null) return;
-        if (!dbContext.Users.Contains(user)) return;
+        return await dbContext.Users
+            .FirstOrDefaultAsync(user => user.Email == email) ??
+            throw new ObjectNotFoundException();
+    } 
 
-        dbContext.Entry(user).State = EntityState.Modified;
-        await dbContext.SaveChangesAsync();
+    public async Task Update(User user) // update own profile 
+    {
+        try
+        {
+            User existed = await GetById(user.Id);
+
+            user.LastUpdatedAt = DateTime.Now;
+            dbContext.Entry(user).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception) { throw; }
     }
 }
