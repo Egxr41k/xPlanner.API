@@ -7,12 +7,13 @@ public static class UserEndpoits
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
+        var endpoints = app.MapGroup("/api/user/").RequireAuthorization();
 
-        app.MapGet("/api/user", GetAllNotesHandler);
-        app.MapGet("/api/user/{id:int}", GetNoteByIdHandler);
-        app.MapPost("/api/user", AddNoteHandler);
-        app.MapPut("/api/user", UpdateNoteHandler);
-        app.MapDelete("/api/user/{id:int}", DeleteNoteHandler);
+        endpoints.MapGet("", GetAllNotesHandler);
+        endpoints.MapGet("{id:int}", GetNoteByIdHandler);
+        endpoints.MapPost("", AddNoteHandler);
+        endpoints.MapPut("", UpdateNoteHandler);
+        endpoints.MapDelete("{id:int}", DeleteNoteHandler);
     }
 
     private static async Task<IResult> GetAllNotesHandler(IRepository<User> repository)

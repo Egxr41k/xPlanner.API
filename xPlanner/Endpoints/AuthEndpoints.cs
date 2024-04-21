@@ -18,10 +18,13 @@ public static class AuthEndpoints
 
     }
 
-    private static async Task<IResult> LoginHandler(AuthRequest request, AuthService service)
+    private static async Task<IResult> LoginHandler(AuthRequest request, AuthService service, HttpContext context)
     {
         string token = await service.Login(request);
-        return Results.Ok(token);
+
+        context.Response.Cookies.Append("tasty-cookies", token);
+
+        return Results.Ok();
     }
 
     private static async Task<IResult> LogoutHandler()
