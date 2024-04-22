@@ -13,7 +13,7 @@ public class UserRepository : IRepository<User>
         this.dbContext = dbContext;
     }
 
-    public async Task Add(User user) // register
+    public async Task Add(User user)
     {
         try
         {
@@ -29,7 +29,7 @@ public class UserRepository : IRepository<User>
         }
     }
 
-    public async Task Delete(int id) // delete own profile 
+    public async Task Delete(int id)
     {
         try
         {
@@ -41,26 +41,26 @@ public class UserRepository : IRepository<User>
         catch (Exception) { throw; }
     }
 
-    public async Task<List<User>> GetAll() // get Top 
+    public async Task<List<User>> GetAll()
     {
         return await dbContext.Users.ToListAsync();
     }
 
-    public async Task<User> GetById(int id) // view profile
+    public async Task<User> GetById(int id)
     {
         return await dbContext.Users
             .FirstOrDefaultAsync(user => user.Id == id) ??
             throw new ObjectNotFoundException();
     }
 
-    public async Task<User> GetByEmail(string email) // view profile
+    public async Task<User> GetByEmail(string email)
     {
         return await dbContext.Users
             .FirstOrDefaultAsync(user => user.Email == email) ??
             throw new ObjectNotFoundException();
     } 
 
-    public async Task Update(User user) // update own profile 
+    public async Task Update(User user)
     {
         try
         {
