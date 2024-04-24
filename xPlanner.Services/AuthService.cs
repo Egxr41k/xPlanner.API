@@ -1,18 +1,20 @@
-﻿using xPlanner.Data.Repository;
+﻿using Microsoft.AspNetCore.Http;
+using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
 
 namespace xPlanner.Auth;
 
 public record AuthRequest(string Email, string Password);
+public record AuthResponce(string AccessToken, User User);
 
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly IPasswordHasher passwordHasher;
     private readonly UserRepository userRepository;
     private readonly IJwtProvider jwtProvider;
 
     public AuthService(
-        IPasswordHasher passwordHasher, 
+        IPasswordHasher passwordHasher,
         IRepository<User> userRepository,
         IJwtProvider jwtProvider)
     {
@@ -21,31 +23,98 @@ public class AuthService
         this.jwtProvider = jwtProvider;
     }
 
-    public async Task Register(AuthRequest authRequest)
+    public async Task<AuthResponce> Register(
+        AuthRequest request, 
+        HttpContext context)
     {
-        var hashedPassword = passwordHasher.Generate(authRequest.Password);
+        await CheckIfUserExists(request.Email);
 
-        User user = new()
+        var user = await CreateUser(request);
+
+        var accessToken = GenerateAndSaveTokens(user, context);
+
+        return new AuthResponce(accessToken, user);
+    }
+
+    public async Task<AuthResponce> Login(
+        AuthRequest request, 
+        HttpContext context)
+    {
+        var user = await GetUserByEmailAndPassword(request);
+
+        var accessToken = GenerateAndSaveTokens(user, context);
+
+        return new AuthResponce(accessToken, user);
+    }
+
+    public async Task<AuthResponce> RefreshAccessToken(HttpContext context)
+    {
+        var refreshToken = context.Request.Cookies["refreshToken"];
+
+        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+
+        var user = await userRepository.GetById(userId);
+
+        var accessToken = GenerateAndSaveTokens(user, context);
+
+        return new AuthResponce(accessToken, user);
+    }
+
+    public async Task Logout(HttpContext context)
+    {
+        context.Response.Cookies.Delete("refreshToken");
+    }
+
+    private async Task CheckIfUserExists(string email)
+    {
+        var existingUser = await userRepository.GetByEmail(email);
+        if (existingUser != null)
         {
-            Email = authRequest.Email,
-            Password = hashedPassword,
+            throw new InvalidOperationException("User already exists.");
+        }
+    }
+
+    private async Task<User> CreateUser(AuthRequest request)
+    {
+        var hashedPassword = passwordHasher.Generate(request.Password);
+
+        var user = new User
+        {
+            Email = request.Email,
+            Password = hashedPassword
         };
 
         await userRepository.Add(user);
+
+        return user;
     }
 
-    public async Task<string> Login(AuthRequest authRequest)
+    private async Task<User> GetUserByEmailAndPassword(AuthRequest authRequest)
     {
-        User user = await userRepository.GetByEmail(authRequest.Email);
+        var user = await userRepository.GetByEmail(authRequest.Email);
 
-        bool isVerified = passwordHasher.Verify(authRequest.Password, user.Password);
-
-        if (!isVerified)
+        if (user == null || !passwordHasher.Verify(authRequest.Password, user.Password))
         {
-            throw new ArgumentException();
+            throw new InvalidOperationException("Invalid email or password.");
         }
 
-        string token = jwtProvider.GenerateToken(user);
-        return token;
+        return user;
+    }
+
+    private string GenerateAndSaveTokens(User user, HttpContext context)
+    {
+        var accessToken = jwtProvider.GenerateToken(user);
+        var refreshToken = Guid.NewGuid().ToString();
+
+        var options = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        };
+
+        context.Response.Cookies.Append("refreshToken", refreshToken, options);
+
+        return accessToken;
     }
 }

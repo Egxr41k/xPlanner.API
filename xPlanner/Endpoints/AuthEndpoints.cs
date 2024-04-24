@@ -8,25 +8,40 @@ public static class AuthEndpoints
     {
         app.MapPost("api/auth/register", RegisterHandler);
         app.MapPost("api/auth/login", LoginHandler);
+        app.MapPost("api/auth/access-token", AccessTokenHandler);
         app.MapPost("api/auth/logout", LogoutHandler);
     }
 
-    private static async Task<IResult> RegisterHandler(AuthRequest request, AuthService service)
+    private static async Task<IResult> RegisterHandler(
+        AuthRequest request, 
+        AuthService service, 
+        HttpContext context)
     {
-        await service.Register(request);
-        return Results.Ok();
+        var result = await service.Register(request, context);
+        return Results.Ok(result);
     }
 
-    private static async Task<IResult> LoginHandler(AuthRequest request, AuthService service, HttpContext context)
+    private static async Task<IResult> LoginHandler(
+        AuthRequest request, 
+        AuthService service, 
+        HttpContext context)
     {
-        string token = await service.Login(request);
-        context.Response.Cookies.Append("tasty-cookies", token);
-        return Results.Ok();
+        var result = await service.Login(request, context);
+        return Results.Ok(result);
+    }
+    private static async Task<IResult> AccessTokenHandler(
+        AuthService service,
+        HttpContext context)
+    {
+        var result = await service.RefreshAccessToken(context);
+        return Results.Ok(result);
     }
 
-    private static async Task<IResult> LogoutHandler(HttpContext context)
+    private static async Task<IResult> LogoutHandler(
+        AuthService service, 
+        HttpContext context)
     {
-        context.Response.Cookies.Delete("tasty-cookies");
+        await service.Logout(context);
         return Results.Ok();
     }
 }

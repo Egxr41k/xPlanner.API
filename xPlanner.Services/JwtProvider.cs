@@ -21,6 +21,7 @@ public class JwtOptions
 public interface IJwtProvider
 {
     string GenerateToken(User user);
+    int GetInfoFromToken(string token);
 }
 
 public class JwtProvider : IJwtProvider
@@ -47,5 +48,23 @@ public class JwtProvider : IJwtProvider
 
         string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
         return tokenValue;
+    }
+
+    public int GetInfoFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        if (tokenHandler.ReadToken(token) is not JwtSecurityToken securityToken)
+        {
+            throw new SecurityTokenException("Invalid token");
+        }
+
+        var userIdClaim = securityToken.Claims.FirstOrDefault(c => c.Type == "userId");
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+        {
+            throw new SecurityTokenException("Invalid token");
+        }
+
+        return userId;
     }
 }

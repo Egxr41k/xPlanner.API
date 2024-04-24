@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 
-builder.Services.AddApiAuthentication(builder.Configuration);
+builder.Services.AddCustomAuthentication(builder.Configuration);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
