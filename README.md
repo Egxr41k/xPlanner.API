@@ -1,7 +1,6 @@
-# xPlanner
-[API schema]
+# xPlanner [API schema]
 
-## Auth:
+### Auth:
 
 [POST] /auth/register (string email, string password)
 1. check is user exist. if not create new user
@@ -25,7 +24,7 @@
 [POST] /auth/logout
 1. remove  refresh token from cookie
 
-## Timer
+### Timer
 
 [GET] user/timer/today
 
@@ -37,7 +36,7 @@
 
 [DELETE] user/timer/:id (int id)
 
-## Task
+### Task
 
 [GET] user/tasks
 
@@ -47,7 +46,7 @@
 
 [DELETE] user/tasks/:id (int id)
 
-## TimeBlock
+### TimeBlock
 
 [GET] user/time-blocks
 
@@ -59,7 +58,7 @@
 
 [DELETE] user/time-blocks/:id (int id)
 
-## User
+### User
 [GET] user/profile
 
 [POST] user/profile (string email, string name, string password, int workInterval, int breakInterval, int intervalsCount)
