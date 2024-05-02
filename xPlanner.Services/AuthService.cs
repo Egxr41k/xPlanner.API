@@ -1,11 +1,20 @@
 ﻿using Microsoft.AspNetCore.Http;
+using xPlanner.Auth;
 using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
 
-namespace xPlanner.Auth;
+namespace xPlanner.Services;
 
 public record AuthRequest(string Email, string Password);
 public record AuthResponce(string AccessToken, User User);
+
+public interface IAuthService
+{
+    Task<AuthResponce> Login(AuthRequest request, HttpContext context);
+    Task Logout(HttpContext context);
+    Task<AuthResponce> RefreshAccessToken(HttpContext context);
+    Task<AuthResponce> Register(AuthRequest request, HttpContext context);
+}
 
 public class AuthService : IAuthService
 {

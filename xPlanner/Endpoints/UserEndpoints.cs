@@ -1,56 +1,38 @@
-﻿using xPlanner.Data.Repository;
-using xPlanner.Domain.Entities;
-
-namespace xPlanner.Endpoints;
+﻿namespace xPlanner.Endpoints;
 
 public static class UserEndpoits
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
-        var endpoints = app.MapGroup("/api/user/").RequireAuthorization();
-
-        endpoints.MapGet("", GetAllNotesHandler);
-        endpoints.MapGet("{id:int}", GetNoteByIdHandler);
-        endpoints.MapPost("", AddNoteHandler);
-        endpoints.MapPut("", UpdateNoteHandler);
-        endpoints.MapDelete("{id:int}", DeleteNoteHandler);
+        app.MapGet("api/user/profile", GetUsers);
+        app.MapGet("api/user/profile/{id:int}", GetUsersById);
+        app.MapPost("api/user/profile", CreateUser);
+        app.MapPut("api/user/profile/{id:int}", UpdateUser);
+        app.MapDelete("api/user/profile/{id:int}", DeleteUser);
     }
 
-    private static async Task<IResult> GetAllNotesHandler(IRepository<User> repository)
+    private static async Task GetUsers(HttpContext context)
     {
-        var result = await repository.GetAll();
-        return Results.Ok(result);
+        throw new NotImplementedException();
     }
 
-    private static async Task<IResult> GetNoteByIdHandler(IRepository<User> repository, int id)
+    private static async Task GetUsersById(HttpContext context)
     {
-        var note = await repository.GetById(id);
-        return note.Id == 0 ? Results.NotFound() : Results.Ok(note);
+        throw new NotImplementedException();
     }
 
-    private static async Task<IResult> AddNoteHandler(IRepository<User> repository, User user)
+    private static async Task CreateUser(HttpContext context)
     {
-        await repository.Add(user);
-        return Results.CreatedAtRoute("/api/user/{id}", new { id = user.Id }, user);
+        throw new NotImplementedException();
     }
 
-    private static async Task<IResult> UpdateNoteHandler(IRepository<User> repository, User user)
+    private static async Task UpdateUser(HttpContext context)
     {
-        var existingUser = await repository.GetById(user.Id);
-        if (existingUser == null) return Results.NotFound();
-
-        existingUser.Name = user.Name;
-
-        await repository.Update(existingUser);
-        return Results.Ok(existingUser);
+        throw new NotImplementedException();
     }
 
-    private static async Task<IResult> DeleteNoteHandler(IRepository<User> repository, int id)
+    private static async Task DeleteUser(HttpContext context)
     {
-        var existingUser = await repository.GetById(id);
-        if (existingUser == null) return Results.NotFound();
-
-        await repository.Delete(existingUser.Id);
-        return Results.Ok();
+        throw new NotImplementedException();
     }
 }

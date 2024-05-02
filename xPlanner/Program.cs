@@ -5,6 +5,7 @@ using xPlanner.Data;
 using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
 using xPlanner.Endpoints;
+using xPlanner.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

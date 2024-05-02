@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xPlanner", "xPlanner\xPlann
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xPlanner.Domain", "xPlanner.Domain\xPlanner.Domain.csproj", "{F4E5AB70-9EDB-4897-B557-4F697728D50E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xPlanner.Data", "xPlanner.Data\xPlanner.Data.csproj", "{F8389E6C-F4DF-47DA-8661-1F88F187901A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xPlanner.Data", "xPlanner.Data\xPlanner.Data.csproj", "{F8389E6C-F4DF-47DA-8661-1F88F187901A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xPlanner.Auth", "xPlanner.Services\xPlanner.Auth.csproj", "{49A61059-B878-447F-9372-0D1759939E19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xPlanner.Services", "xPlanner.Seevices\xPlanner.Services.csproj", "{355D3AE2-3EF4-422C-9D33-EB300655FAFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{49A61059-B878-447F-9372-0D1759939E19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49A61059-B878-447F-9372-0D1759939E19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49A61059-B878-447F-9372-0D1759939E19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{355D3AE2-3EF4-422C-9D33-EB300655FAFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{355D3AE2-3EF4-422C-9D33-EB300655FAFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{355D3AE2-3EF4-422C-9D33-EB300655FAFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{355D3AE2-3EF4-422C-9D33-EB300655FAFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
