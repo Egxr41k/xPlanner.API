@@ -10,8 +10,8 @@ namespace xPlanner.Data.Repository
     {
         Task<List<T>> GetAll();
         Task<T> GetById(int id);
-        Task Add(T entity);
-        Task Update(T entity);
-        Task Delete(int id);
+        Task<T> Add(T entity);
+        Task<T> Update(T entity);
+        Task<T> Delete(int id);
     }
 }

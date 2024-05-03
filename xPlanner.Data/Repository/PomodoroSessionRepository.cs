@@ -1,31 +1,60 @@
-﻿using xPlanner.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Core;
+using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
 
 internal class PomodoroSessionRepository : IRepository<PomodoroSession>
 {
-    public Task Add(PomodoroSession entity)
+    private readonly AppDbContext dbContext;
+
+    public PomodoroSessionRepository(AppDbContext dbContext)
     {
-        throw new NotImplementedException();
+        this.dbContext = dbContext;
     }
 
-    public Task Delete(int id)
+    public async Task<PomodoroSession> Add(PomodoroSession session)
     {
-        throw new NotImplementedException();
+        await dbContext.PomodoroSessions.AddAsync(session);
+        await dbContext.SaveChangesAsync();
+
+        return session;
     }
 
-    public Task<List<PomodoroSession>> GetAll()
+    public async Task<PomodoroSession> Delete(int id)
     {
-        throw new NotImplementedException();
+        var user = await GetById(id);
+
+        dbContext.PomodoroSessions.Remove(user);
+        await dbContext.SaveChangesAsync();
+
+        return user;
     }
 
-    public Task<PomodoroSession> GetById(int id)
+    public async Task<List<PomodoroSession>> GetAll()
     {
-        throw new NotImplementedException();
+        return await dbContext.PomodoroSessions
+            .Include(s => s.Rounds).ToListAsync();
     }
 
-    public Task Update(PomodoroSession entity)
+    public async Task<PomodoroSession> GetById(int id)
     {
-        throw new NotImplementedException();
+        return await dbContext.PomodoroSessions
+             .Include(session => session.Rounds)
+             .FirstOrDefaultAsync(session => session.Id == id) ??
+             throw new ObjectNotFoundException();
+    }
+
+    public async Task<PomodoroSession> Update(PomodoroSession session)
+    {
+        var existingSession = await GetById(session.Id);
+        
+        existingSession.Rounds = session.Rounds;
+        existingSession.IsCompleted = session.IsCompleted;
+        existingSession.LastUpdatedAt = DateTime.UtcNow;
+
+        await dbContext.SaveChangesAsync();
+
+        return existingSession;
     }
 }

@@ -16,34 +16,36 @@ public class UserRepository : IRepository<User>
     public async Task<List<User>> GetAll()
     {
         return await dbContext.Users
-            .Include(u => u.Tasks)
-            .Include(u => u.TimeBlocks)
-            .Include(u => u.Sessions)
-            .Include(u => u.Settings)
+            .Include(user => user.Tasks)
+            .Include(user => user.TimeBlocks)
+            .Include(user => user.Sessions)
+            .Include(user => user.Settings)
             .ToListAsync();
     }
 
     public async Task<User> GetById(int id)
     {
         return await dbContext.Users
-            .Include(u => u.Tasks)
-            .Include(u => u.TimeBlocks)
-            .Include(u => u.Sessions)
-            .Include(u => u.Settings)
-            .FirstOrDefaultAsync(u => u.Id == id)
-            ?? throw new ObjectNotFoundException();
+            .Include(user => user.Tasks)
+            .Include(user => user.TimeBlocks)
+            .Include(user => user.Sessions)
+            .Include(user => user.Settings)
+            .FirstOrDefaultAsync(u => u.Id == id) ?? 
+            throw new ObjectNotFoundException();
     }
 
-    public async Task Add(User user)
+    public async Task<User> Add(User user)
     {
         user.CreatedAt = DateTime.UtcNow;
         user.Name = user.Email; // Set name to email by default
 
         await dbContext.Users.AddAsync(user);
         await dbContext.SaveChangesAsync();
+
+        return user;
     }
 
-    public async Task Update(User user)
+    public async Task<User> Update(User user)
     {
         var existingUser = await GetById(user.Id);
 
@@ -54,13 +56,17 @@ public class UserRepository : IRepository<User>
         // Update related entities if necessary (e.g., Tasks, TimeBlocks, Sessions)
 
         await dbContext.SaveChangesAsync();
+
+        return existingUser;
     }
 
-    public async Task Delete(int id)
+    public async Task<User> Delete(int id)
     {
         var user = await GetById(id);
 
         dbContext.Users.Remove(user);
         await dbContext.SaveChangesAsync();
+
+        return user;
     }
 }

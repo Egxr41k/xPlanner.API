@@ -4,12 +4,12 @@ namespace xPlanner.Data.Repository;
 
 internal class PomodoroRoundRepository : IRepository<PomodoroRound>
 {
-    public Task Add(PomodoroRound entity)
+    public Task<PomodoroRound> Add(PomodoroRound entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task Delete(int id)
+    public Task<PomodoroRound> Delete(int id)
     {
         throw new NotImplementedException();
     }
@@ -24,7 +24,7 @@ internal class PomodoroRoundRepository : IRepository<PomodoroRound>
         throw new NotImplementedException();
     }
 
-    public Task Update(PomodoroRound entity)
+    public Task<PomodoroRound> Update(PomodoroRound entity)
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,7 @@
-﻿namespace xPlanner.Endpoints;
+﻿using xPlanner.Domain.Entities;
+using xPlanner.Services;
+
+namespace xPlanner.Endpoints;
 
 public static class PomodoroEndpoints
 {
@@ -11,28 +14,48 @@ public static class PomodoroEndpoints
         app.MapDelete("api/user/timer/{id:int}", DeleteSession);
     }
 
-    private static async Task DeleteSession(HttpContext context)
+    private static async Task<IResult> DeleteSession(
+        int id,
+        HttpContext context,
+        PomodoroService service)
     {
-        throw new NotImplementedException();
+        var result = await service.DeleteSession(context, id);
+        return Results.Ok(result);
     }
 
-    private static async Task UpdateSession(HttpContext context)
+    private static async Task<IResult> UpdateSession(
+        int id,
+        HttpContext context,
+        PomodoroService service,
+        PomodoroSession session)
     {
-        throw new NotImplementedException();
+        var result = await service.UpdateSession(context, session);
+        return Results.Ok(result);
     }
 
-    private static async Task UpdateRound(HttpContext context)
+    private static async Task<IResult> UpdateRound(
+        int id,
+        HttpContext context, 
+        PomodoroService service,
+        PomodoroRoundRequest round)
     {
-        throw new NotImplementedException();
+        var result = await service.UpdateRound(context, round);
+        return Results.Ok(result);
     }
 
-    private static async Task CreateSession(HttpContext context)
+    private static async Task<IResult> CreateSession(
+        HttpContext context,
+        PomodoroService service)
     {
-        throw new NotImplementedException();
+        var result = await service.CreateSession(context);
+        return Results.Ok(result);
     }
 
-    private static async Task GetTodaySession(HttpContext context)
+    private static async Task<IResult> GetTodaySession(
+        HttpContext context,
+        PomodoroService service)
     {
-        throw new NotImplementedException();
+        var result = await service.GetTodaySession(context);
+        return Results.Ok(result);
     }
 }
