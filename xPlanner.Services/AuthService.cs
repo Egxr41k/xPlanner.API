@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Data.Entity.Core;
 using xPlanner.Auth;
 using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
@@ -19,7 +20,7 @@ public interface IAuthService
 public class AuthService : IAuthService
 {
     private readonly IPasswordHasher passwordHasher;
-    private readonly UserRepository userRepository;
+    private readonly IRepository<User> userRepository;
     private readonly IJwtProvider jwtProvider;
 
     public AuthService(
@@ -76,7 +77,7 @@ public class AuthService : IAuthService
 
     private async Task CheckIfUserExists(string email)
     {
-        var existingUser = await userRepository.GetByEmail(email);
+        var existingUser = await GetByEmail(email);
         if (existingUser != null)
         {
             throw new InvalidOperationException("User already exists.");
@@ -100,7 +101,7 @@ public class AuthService : IAuthService
 
     private async Task<User> GetUserByEmailAndPassword(AuthRequest authRequest)
     {
-        var user = await userRepository.GetByEmail(authRequest.Email);
+        var user = await GetByEmail(authRequest.Email);
 
         if (user == null || !passwordHasher.Verify(authRequest.Password, user.Password))
         {
@@ -108,6 +109,14 @@ public class AuthService : IAuthService
         }
 
         return user;
+    }
+
+    public async Task<User> GetByEmail(string email)
+    {
+        var users = await userRepository.GetAll();
+
+        return users.FirstOrDefault(u => u.Email == email)
+            ?? throw new ObjectNotFoundException();
     }
 
     private string GenerateAndSaveTokens(User user, HttpContext context)

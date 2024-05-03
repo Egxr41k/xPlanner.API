@@ -1,4 +1,8 @@
-﻿namespace xPlanner.Endpoints;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using xPlanner.Domain.Entities;
+using xPlanner.Services;
+
+namespace xPlanner.Endpoints;
 
 public static class UserEndpoits
 {
@@ -16,9 +20,12 @@ public static class UserEndpoits
         throw new NotImplementedException();
     }
 
-    private static async Task GetUsersById(HttpContext context)
+    private static async Task<IResult> GetUsersById(
+        UserService service,
+        HttpContext context)
     {
-        throw new NotImplementedException();
+        var result = await service.GetUser(context);
+        return Results.Ok(result);
     }
 
     private static async Task CreateUser(HttpContext context)
@@ -26,9 +33,13 @@ public static class UserEndpoits
         throw new NotImplementedException();
     }
 
-    private static async Task UpdateUser(HttpContext context)
+    private static async Task<IResult> UpdateUser(
+        UserService service,
+        User user,
+        HttpContext context)
     {
-        throw new NotImplementedException();
+        await service.UpdateUser(context, user);
+        return Results.Ok();
     }
 
     private static async Task DeleteUser(HttpContext context)

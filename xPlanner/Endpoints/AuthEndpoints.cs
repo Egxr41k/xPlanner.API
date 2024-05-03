@@ -1,5 +1,4 @@
-﻿using xPlanner.Auth;
-using xPlanner.Services;
+﻿using xPlanner.Services;
 
 namespace xPlanner.Endpoints;
 

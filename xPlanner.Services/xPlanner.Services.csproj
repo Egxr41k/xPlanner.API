@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\xPlanner.Services\xPlanner.Auth.csproj" />
+    <ProjectReference Include="..\xPlanner.Auth\xPlanner.Auth.csproj" />
   </ItemGroup>
 
 </Project>

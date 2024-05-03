@@ -13,63 +13,54 @@ public class UserRepository : IRepository<User>
         this.dbContext = dbContext;
     }
 
-    public async Task Add(User user)
-    {
-        try
-        {
-            User existed = await GetById(user.Id);
-        } 
-        catch (ObjectNotFoundException)
-        {
-            user.Id = dbContext.Users.Count();
-            user.CreatedAt = DateTime.UtcNow;
-            user.Name = user.Email;
-            await dbContext.Users.AddAsync(user);
-            await dbContext.SaveChangesAsync();
-        }
-    }
-
-    public async Task Delete(int id)
-    {
-        try
-        {
-            User user = await GetById(id);
-
-            dbContext.Users.Remove(user);
-            await dbContext.SaveChangesAsync();
-        }
-        catch (Exception) { throw; }
-    }
-
     public async Task<List<User>> GetAll()
     {
-        return await dbContext.Users.ToListAsync();
+        return await dbContext.Users
+            .Include(u => u.Tasks)
+            .Include(u => u.TimeBlocks)
+            .Include(u => u.Sessions)
+            .Include(u => u.Settings)
+            .ToListAsync();
     }
 
     public async Task<User> GetById(int id)
     {
         return await dbContext.Users
-            .FirstOrDefaultAsync(user => user.Id == id) ??
-            throw new ObjectNotFoundException();
+            .Include(u => u.Tasks)
+            .Include(u => u.TimeBlocks)
+            .Include(u => u.Sessions)
+            .Include(u => u.Settings)
+            .FirstOrDefaultAsync(u => u.Id == id)
+            ?? throw new ObjectNotFoundException();
     }
 
-    public async Task<User> GetByEmail(string email)
+    public async Task Add(User user)
     {
-        return await dbContext.Users
-            .FirstOrDefaultAsync(user => user.Email == email) ??
-            throw new ObjectNotFoundException();
-    } 
+        user.CreatedAt = DateTime.UtcNow;
+        user.Name = user.Email; // Set name to email by default
+
+        await dbContext.Users.AddAsync(user);
+        await dbContext.SaveChangesAsync();
+    }
 
     public async Task Update(User user)
     {
-        try
-        {
-            User existed = await GetById(user.Id);
+        var existingUser = await GetById(user.Id);
 
-            user.LastUpdatedAt = DateTime.Now;
-            dbContext.Entry(user).State = EntityState.Modified;
-            await dbContext.SaveChangesAsync();
-        }
-        catch (Exception) { throw; }
+        existingUser.Email = user.Email;
+        existingUser.Password = user.Password;
+        existingUser.LastUpdatedAt = DateTime.UtcNow;
+
+        // Update related entities if necessary (e.g., Tasks, TimeBlocks, Sessions)
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task Delete(int id)
+    {
+        var user = await GetById(id);
+
+        dbContext.Users.Remove(user);
+        await dbContext.SaveChangesAsync();
     }
 }
