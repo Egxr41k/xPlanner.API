@@ -111,22 +111,22 @@ public class AuthService : IAuthService
         return user;
     }
 
-    public async Task<User> GetByEmail(string email)
+    public async Task<User?> GetByEmail(string email)
     {
         var users = await userRepository.GetAll();
 
-        return users.FirstOrDefault(u => u.Email == email)
-            ?? throw new ObjectNotFoundException();
+        return users.FirstOrDefault(u => u.Email == email);
+            //?? throw new ObjectNotFoundException();
     }
 
     private string GenerateAndSaveTokens(User user, HttpContext context)
     {
         var accessToken = jwtProvider.GenerateToken(user);
-        var refreshToken = Guid.NewGuid().ToString();
+        var refreshToken = jwtProvider.GenerateToken(user, 168);
 
         var options = new CookieOptions
         {
-            HttpOnly = true,
+            HttpOnly = false,
             Secure = true,
             SameSite = SameSiteMode.Strict
         };

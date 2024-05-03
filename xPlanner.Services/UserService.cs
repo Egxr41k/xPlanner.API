@@ -11,7 +11,7 @@ public class UserService
     private readonly IJwtProvider jwtProvider;
 
     public UserService(
-        IRepository<User> userRepository, 
+        IRepository<User> userRepository,
         IJwtProvider jwtProvider) 
     {
         repository = userRepository;

@@ -25,6 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
 
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();

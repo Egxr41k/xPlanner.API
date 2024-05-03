@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\xPlanner.Data\xPlanner.Data.csproj" />
     <ProjectReference Include="..\xPlanner.Domain\xPlanner.Domain.csproj" />
+    <ProjectReference Include="..\xPlanner.Services\xPlanner.Services.csproj" />
   </ItemGroup>
 
 </Project>

@@ -20,7 +20,7 @@ public class JwtOptions
 
 public interface IJwtProvider
 {
-    string GenerateToken(User user);
+    string GenerateToken(User user, int? expiredHours = null);
     int GetInfoFromToken(string token);
 }
 
@@ -33,9 +33,9 @@ public class JwtProvider : IJwtProvider
         this.options = options.Value;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(User user, int? expiredHours = null)
     {
-        Claim userId = new("userId:", user.Id.ToString());
+        Claim userId = new("userId", user.Id.ToString());
 
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SecretKey)),
@@ -44,7 +44,7 @@ public class JwtProvider : IJwtProvider
         var token = new JwtSecurityToken(
             claims: [userId],
             signingCredentials: signingCredentials,
-            expires: DateTime.Now.AddHours(options.ExpiredHours));
+            expires: DateTime.Now.AddHours(expiredHours ?? options.ExpiredHours));
 
         string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
         return tokenValue;
