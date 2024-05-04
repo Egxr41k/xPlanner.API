@@ -1,31 +1,56 @@
-﻿using xPlanner.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Core;
+using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
 
 internal class UserTaskRepository : IRepository<UserTask>
 {
-    public Task Add(UserTask entity)
+    private readonly AppDbContext dbContext;
+
+    public UserTaskRepository(AppDbContext dbContext)
     {
-        throw new NotImplementedException();
+        this.dbContext = dbContext;
     }
 
-    public Task Delete(int id)
+    public async Task<UserTask> Add(UserTask task)
     {
-        throw new NotImplementedException();
+        await dbContext.Tasks.AddAsync(task);
+        await dbContext.SaveChangesAsync();
+
+        return task;
     }
 
-    public Task<List<UserTask>> GetAll()
+    public async Task<UserTask> Delete(int id)
     {
-        throw new NotImplementedException();
+        var task = await GetById(id);
+
+        dbContext.Tasks.Remove(task);
+        await dbContext.SaveChangesAsync();
+
+        return task;
     }
 
-    public Task<UserTask> GetById(int id)
+    public async Task<List<UserTask>> GetAll()
     {
-        throw new NotImplementedException();
+        return await dbContext.Tasks.ToListAsync();
     }
 
-    public Task Update(UserTask entity)
+    public async Task<UserTask> GetById(int id)
     {
-        throw new NotImplementedException();
+        return await dbContext.Tasks
+            .FirstOrDefaultAsync(task => task.Id == id) ??
+             throw new ObjectNotFoundException();
+    }
+
+    public async Task<UserTask> Update(UserTask task)
+    {
+        var existingTask = await GetById(task.Id);
+       
+        existingTask = task;
+
+        await dbContext.SaveChangesAsync();
+
+        return existingTask;
     }
 }

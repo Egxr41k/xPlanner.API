@@ -1,4 +1,7 @@
-﻿namespace xPlanner.Endpoints;
+﻿using xPlanner.Domain.Entities;
+using xPlanner.Services;
+
+namespace xPlanner.Endpoints;
 
 public static class UserTaskEndopints
 {
@@ -10,23 +13,39 @@ public static class UserTaskEndopints
         app.MapDelete("api/user/tasks/{id:int}", DeleteTask);
     }
 
-    private static async Task DeleteTask(HttpContext context)
+    private static async Task<IResult> DeleteTask(
+        int id,
+        HttpContext context,
+        UserTaskService service)
     {
-        throw new NotImplementedException();
+        var result = await service.DeleteTask(id, context);
+        return Results.Ok(result);
     }
 
-    private static async Task UpdateTask(HttpContext context)
+    private static async Task<IResult> UpdateTask(
+        int id,
+        UserTaskRequest userTask,
+        HttpContext context,
+        UserTaskService service)
     {
-        throw new NotImplementedException();
+        var result = await service.UpdateTask(id, userTask, context);
+        return Results.Ok(result);
     }
 
-    private static async Task CreateTask(HttpContext context)
+    private static async Task<IResult> CreateTask(
+        UserTaskRequest userTask,
+        HttpContext context,
+        UserTaskService service)
     {
-        throw new NotImplementedException();
+        var result = await service.CreateTask(userTask, context);
+        return Results.Ok(result);
     }
 
-    private static async Task GetTasks(HttpContext context)
+    private static async Task<IResult> GetTasks(
+        HttpContext context,
+        UserTaskService service)
     {
-        throw new NotImplementedException();
+        var result = await service.GetTasks(context);
+        return Results.Ok(result);
     }
 }

@@ -23,12 +23,12 @@ internal class PomodoroSessionRepository : IRepository<PomodoroSession>
 
     public async Task<PomodoroSession> Delete(int id)
     {
-        var user = await GetById(id);
+        var session = await GetById(id);
 
-        dbContext.PomodoroSessions.Remove(user);
+        dbContext.PomodoroSessions.Remove(session);
         await dbContext.SaveChangesAsync();
 
-        return user;
+        return session;
     }
 
     public async Task<List<PomodoroSession>> GetAll()

@@ -39,7 +39,7 @@ public static class PomodoroEndpoints
         PomodoroService service,
         PomodoroRoundRequest round)
     {
-        var result = await service.UpdateRound(context, round);
+        var result = await service.UpdateRound(id, context, round);
         return Results.Ok(result);
     }
 

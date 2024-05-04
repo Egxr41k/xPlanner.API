@@ -62,10 +62,14 @@ public class PomodoroService
     }
 
     public async Task<PomodoroSession> UpdateSession(
-        HttpContext context, 
-        PomodoroSession session)
+        int sessionId,
+        HttpContext context,
+        PomodoroSessionRequest session)
     {
-        return await repository.Update(session);
+        var existingSession = await repository.GetById(sessionId);
+        existingSession.IsCompleted = session.isCompleted;
+
+        return await repository.Update(existingSession);
     }
 
     public async Task<PomodoroSession> UpdateRound(
