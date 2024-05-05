@@ -44,7 +44,7 @@ public class UserTaskService
         var refreshToken = context.Request.Cookies["refreshToken"];
         var userId = jwtProvider.GetInfoFromToken(refreshToken);
 
-        var task = new UserTask()
+        return await repository.Add(new UserTask()
         {
             //TODO: fix data type at UserTask.UserId. string => int
             UserId = userId.ToString(),
@@ -52,9 +52,7 @@ public class UserTaskService
             IsCompleted = userTask.isCompleted,
             CreatedAt = DateTime.UtcNow, //userTask.createdAt,
             Priority = userTask.priority
-        };
-
-        return await repository.Add(task);
+        });
     }
 
     public async Task<UserTask> UpdateTask(

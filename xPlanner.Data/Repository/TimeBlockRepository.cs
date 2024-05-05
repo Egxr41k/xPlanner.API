@@ -1,31 +1,59 @@
-﻿using xPlanner.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Core;
+using System.Threading.Tasks;
+using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
 
 internal class TimeBlockRepository : IRepository<TimeBlock>
 {
-    public Task Add(TimeBlock entity)
+    private readonly AppDbContext dbContext;
+
+    public TimeBlockRepository(AppDbContext dbContext)
     {
-        throw new NotImplementedException();
+        this.dbContext = dbContext;
     }
 
-    public Task Delete(int id)
+    public async Task<TimeBlock> Add(TimeBlock timeBlock)
     {
-        throw new NotImplementedException();
+        await dbContext.TimeBlocks.AddAsync(timeBlock);
+        await dbContext.SaveChangesAsync();
+
+        return timeBlock;
     }
 
-    public Task<List<TimeBlock>> GetAll()
+    public async Task<TimeBlock> Delete(int id)
     {
-        throw new NotImplementedException();
+        var timeBlock = await GetById(id);
+
+        dbContext.TimeBlocks.Remove(timeBlock);
+        await dbContext.SaveChangesAsync();
+
+        return timeBlock;
     }
 
-    public Task<TimeBlock> GetById(int id)
+    public async Task<List<TimeBlock>> GetAll()
     {
-        throw new NotImplementedException();
+        return await dbContext.TimeBlocks
+            .OrderBy(timeBlock => timeBlock.Id)
+            .ToListAsync();
     }
 
-    public Task Update(TimeBlock entity)
+    public async Task<TimeBlock> GetById(int id)
     {
-        throw new NotImplementedException();
+        return await dbContext.TimeBlocks
+            .FirstOrDefaultAsync(timeBlock => timeBlock.Id == id) ??
+             throw new ObjectNotFoundException();
+    }
+
+    public async Task<TimeBlock> Update(TimeBlock timeBlock)
+    {
+        var existingTimeBlock = await GetById(timeBlock.Id);
+
+        existingTimeBlock = timeBlock;
+
+        await dbContext.SaveChangesAsync();
+
+        return existingTimeBlock;
     }
 }
