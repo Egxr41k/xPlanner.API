@@ -34,11 +34,11 @@ public static class UserEndpoits
 
     private static async Task<IResult> UpdateUser(
         UserService service,
-        User user,
+        UserRequest user,
         HttpContext context)
     {
-        await service.UpdateUser(context, user);
-        return Results.Ok();
+        var result = await service.UpdateUser(context, user);
+        return Results.Ok(result);
     }
 
     private static async Task DeleteUser(HttpContext context)

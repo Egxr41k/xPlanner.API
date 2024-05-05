@@ -27,9 +27,9 @@ public static class PomodoroEndpoints
         int id,
         HttpContext context,
         PomodoroService service,
-        PomodoroSession session)
+        PomodoroSessionRequest session)
     {
-        var result = await service.UpdateSession(context, session);
+        var result = await service.UpdateSession(id, context, session);
         return Results.Ok(result);
     }
 
