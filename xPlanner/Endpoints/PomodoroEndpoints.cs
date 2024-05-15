@@ -1,5 +1,4 @@
-﻿using xPlanner.Domain.Entities;
-using xPlanner.Services;
+﻿using xPlanner.Services;
 
 namespace xPlanner.Endpoints;
 

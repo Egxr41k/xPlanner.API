@@ -4,7 +4,7 @@ using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
 
-internal class PomodoroSessionRepository : IRepository<PomodoroSession>
+public class PomodoroSessionRepository : IRepository<PomodoroSession>
 {
     private readonly AppDbContext dbContext;
 

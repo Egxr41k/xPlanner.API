@@ -21,6 +21,7 @@ public static class TimeBlockEndpoints
         var result = await service.DeleteTimeBlock(id);
         return Results.Ok(result);
     }
+
     private static async Task<IResult> UpdateOrder(
         UpdateOrderRequest orderRequest,
         HttpContext context,

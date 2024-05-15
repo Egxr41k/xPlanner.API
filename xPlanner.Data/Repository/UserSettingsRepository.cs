@@ -4,12 +4,12 @@ namespace xPlanner.Data.Repository;
 
 internal class UserSettingsRepository : IRepository<UserSettings>
 {
-    public Task Add(UserSettings entity)
+    public Task<UserSettings> Add(UserSettings entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task Delete(int id)
+    public Task<UserSettings> Delete(int id)
     {
         throw new NotImplementedException();
     }
@@ -24,7 +24,7 @@ internal class UserSettingsRepository : IRepository<UserSettings>
         throw new NotImplementedException();
     }
 
-    public Task Update(UserSettings entity)
+    public Task<UserSettings> Update(UserSettings entity)
     {
         throw new NotImplementedException();
     }

@@ -1,5 +1,4 @@
-﻿using xPlanner.Domain.Entities;
-using xPlanner.Services;
+﻿using xPlanner.Services;
 
 namespace xPlanner.Endpoints;
 
@@ -14,12 +13,14 @@ public static class UserEndpoits
         app.MapDelete("api/user/profile/{id:int}", DeleteUser);
     }
 
-    private static async Task GetUsers(HttpContext context)
+    private static async Task GetUsers(
+        HttpContext context)
     {
         throw new NotImplementedException();
     }
 
     private static async Task<IResult> GetUsersById(
+        int id,
         UserService service,
         HttpContext context)
     {
@@ -27,12 +28,14 @@ public static class UserEndpoits
         return Results.Ok(result);
     }
 
-    private static async Task CreateUser(HttpContext context)
+    private static async Task CreateUser(
+        HttpContext context)
     {
         throw new NotImplementedException();
     }
 
     private static async Task<IResult> UpdateUser(
+        int id,
         UserService service,
         UserRequest user,
         HttpContext context)
@@ -41,7 +44,9 @@ public static class UserEndpoits
         return Results.Ok(result);
     }
 
-    private static async Task DeleteUser(HttpContext context)
+    private static async Task DeleteUser(
+        int id,
+        HttpContext context)
     {
         throw new NotImplementedException();
     }

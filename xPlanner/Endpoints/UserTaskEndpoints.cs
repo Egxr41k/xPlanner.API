@@ -1,11 +1,10 @@
-﻿using xPlanner.Domain.Entities;
-using xPlanner.Services;
+﻿using xPlanner.Services;
 
 namespace xPlanner.Endpoints;
 
-public static class UserTaskEndopints
+public static class UserTaskEndpoints
 {
-    public static void MapUserTaskEndopints(this WebApplication app)
+    public static void MapUserTaskEndpoints(this WebApplication app)
     {
         app.MapGet("api/user/tasks", GetTasks);
         app.MapPost("api/user/tasks", CreateTask);

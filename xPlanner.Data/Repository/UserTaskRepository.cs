@@ -4,7 +4,7 @@ using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
 
-internal class UserTaskRepository : IRepository<UserTask>
+public class UserTaskRepository : IRepository<UserTask>
 {
     private readonly AppDbContext dbContext;
 

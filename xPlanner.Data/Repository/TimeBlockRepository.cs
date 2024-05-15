@@ -5,7 +5,7 @@ using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;
 
-internal class TimeBlockRepository : IRepository<TimeBlock>
+public class TimeBlockRepository : IRepository<TimeBlock>
 {
     private readonly AppDbContext dbContext;
 
