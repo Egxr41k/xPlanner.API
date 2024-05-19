@@ -14,20 +14,16 @@ public record UserTaskRequest(
 public class UserTaskService
 {
     private readonly IRepository<UserTask> repository;
-    private readonly IJwtProvider jwtProvider;
 
-    public UserTaskService(
-        IRepository<UserTask> repository,
-        IJwtProvider jwtProvider)
+    public UserTaskService(IRepository<UserTask> repository)
     {
         this.repository = repository;
-        this.jwtProvider = jwtProvider;
     }
 
     public async Task<List<UserTask>> GetTasks(HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
         var tasks = await repository.GetAll();
 
@@ -41,10 +37,10 @@ public class UserTaskService
         UserTaskRequest userTask,
         HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
-        return await repository.Add(new UserTask()
+        var task = new UserTask()
         {
             //TODO: fix data type at UserTask.UserId. string => int
             UserId = userId.ToString(),
@@ -52,7 +48,9 @@ public class UserTaskService
             IsCompleted = userTask.isCompleted,
             CreatedAt = DateTime.UtcNow, //userTask.createdAt,
             Priority = userTask.priority
-        });
+        };
+
+        return await repository.Add(task);
     }
 
     public async Task<UserTask> UpdateTask(
@@ -64,8 +62,8 @@ public class UserTaskService
 
         task.Name = userTask.name;
         task.IsCompleted = userTask.isCompleted;
-        //task.CreatedAt = userTask.createdAt;
         task.Priority = userTask.priority;
+        task.LastUpdatedAt = DateTime.UtcNow;
 
         return await repository.Update(task);
     }

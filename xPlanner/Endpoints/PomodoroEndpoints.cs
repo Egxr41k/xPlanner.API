@@ -18,7 +18,7 @@ public static class PomodoroEndpoints
         HttpContext context,
         PomodoroService service)
     {
-        var result = await service.DeleteSession(context, id);
+        var result = await service.DeleteSession(id, context);
         return Results.Ok(result);
     }
 

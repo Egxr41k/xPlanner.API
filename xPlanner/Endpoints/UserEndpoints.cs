@@ -6,17 +6,19 @@ public static class UserEndpoits
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
-        app.MapGet("api/user/profile", GetUsers);
+        app.MapGet("api/user/profile", GetUser).RequireAuthorization();
         app.MapGet("api/user/profile/{id:int}", GetUsersById);
         app.MapPost("api/user/profile", CreateUser);
-        app.MapPut("api/user/profile/{id:int}", UpdateUser);
-        app.MapDelete("api/user/profile/{id:int}", DeleteUser);
+        app.MapPut("api/user/profile/{id:int}", UpdateUser).RequireAuthorization();
+        app.MapDelete("api/user/profile/{id:int}", DeleteUser).RequireAuthorization();
     }
 
-    private static async Task GetUsers(
+    private static async Task<IResult> GetUser(
+        UserService service,
         HttpContext context)
     {
-        throw new NotImplementedException();
+        var result = await service.GetUser(context);
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> GetUsersById(

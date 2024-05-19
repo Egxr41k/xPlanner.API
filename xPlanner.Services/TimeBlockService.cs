@@ -16,20 +16,16 @@ public record UpdateOrderRequest(string[] ids);
 public class TimeBlockService
 {
     private readonly IRepository<TimeBlock> repository;
-    private readonly IJwtProvider jwtProvider;
 
-    public TimeBlockService(
-        IRepository<TimeBlock> repository,
-        IJwtProvider jwtProvider)
+    public TimeBlockService(IRepository<TimeBlock> repository)
     {
         this.repository = repository;
-        this.jwtProvider = jwtProvider;
     }
 
     public async Task<List<TimeBlock>> GetTimeBlocks(HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
         var timeBlock = await repository.GetAll();
 
@@ -42,8 +38,8 @@ public class TimeBlockService
     public async Task<TimeBlock> CreateTimeBlock(HttpContext context,
         TimeBlockRequest timeBlock)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
         return await repository.Add(new TimeBlock()
         {
@@ -61,15 +57,11 @@ public class TimeBlockService
     {
         var existingTimeBlock = await repository.GetById(id);
 
-        if (existingTimeBlock == null)
-        {
-            throw new Exception();
-        }
-
         existingTimeBlock.Name = timeBlock.name;
         existingTimeBlock.Color = timeBlock.color;
         existingTimeBlock.Duration = timeBlock.duration;
         existingTimeBlock.Order = timeBlock.order;
+        existingTimeBlock.LastUpdatedAt = DateTime.UtcNow;
 
         return await repository.Update(existingTimeBlock);
     }

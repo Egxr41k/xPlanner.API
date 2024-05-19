@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Data.Entity.Core;
 using xPlanner.Auth;
-using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
 
 namespace xPlanner.Services;
@@ -19,17 +17,14 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    private readonly IPasswordHasher passwordHasher;
-    private readonly IRepository<User> userRepository;
+    private readonly UserService userService;
     private readonly IJwtProvider jwtProvider;
 
     public AuthService(
-        IPasswordHasher passwordHasher,
-        IRepository<User> userRepository,
+        UserService userService,
         IJwtProvider jwtProvider)
     {
-        this.passwordHasher = passwordHasher;
-        this.userRepository = (UserRepository)userRepository;
+        this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
 
@@ -37,11 +32,12 @@ public class AuthService : IAuthService
         AuthRequest request, 
         HttpContext context)
     {
-        await CheckIfUserExists(request.Email);
+        var isUserExists = await userService.CheckIfUserExists(request.Email);
+        if (isUserExists) throw new Exception();
+        
+        var user = await userService.CreateUser(request.Email, request.Password);
 
-        var user = await CreateUser(request);
-
-        var accessToken = GenerateAndSaveTokens(user, context);
+        var accessToken = GenerateAndSaveTokens(user.Id, context);
 
         return new AuthResponce(accessToken, user);
     }
@@ -50,22 +46,21 @@ public class AuthService : IAuthService
         AuthRequest request, 
         HttpContext context)
     {
-        var user = await GetUserByEmailAndPassword(request);
+        var user = await userService.GetUserByEmailAndPassword(request.Email, request.Password);
 
-        var accessToken = GenerateAndSaveTokens(user, context);
+        var accessToken = GenerateAndSaveTokens(user.Id, context);
 
         return new AuthResponce(accessToken, user);
     }
 
     public async Task<AuthResponce> RefreshAccessToken(HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var user = await userService.GetById(userId);
 
-        var user = await userRepository.GetById(userId);
-
-        var accessToken = GenerateAndSaveTokens(user, context);
+        var accessToken = GenerateAndSaveTokens(userId, context);
 
         return new AuthResponce(accessToken, user);
     }
@@ -75,60 +70,16 @@ public class AuthService : IAuthService
         context.Response.Cookies.Delete("refreshToken");
     }
 
-    private async Task CheckIfUserExists(string email)
+    private string GenerateAndSaveTokens(int userId, HttpContext context)
     {
-        var existingUser = await GetByEmail(email);
-        if (existingUser != null)
-        {
-            throw new InvalidOperationException("User already exists.");
-        }
-    }
-
-    private async Task<User> CreateUser(AuthRequest request)
-    {
-        var hashedPassword = passwordHasher.Generate(request.Password);
-
-        var user = new User
-        {
-            Email = request.Email,
-            Password = hashedPassword
-        };
-
-        await userRepository.Add(user);
-
-        return user;
-    }
-
-    private async Task<User> GetUserByEmailAndPassword(AuthRequest authRequest)
-    {
-        var user = await GetByEmail(authRequest.Email);
-
-        if (user == null || !passwordHasher.Verify(authRequest.Password, user.Password))
-        {
-            throw new InvalidOperationException("Invalid email or password.");
-        }
-
-        return user;
-    }
-
-    public async Task<User?> GetByEmail(string email)
-    {
-        var users = await userRepository.GetAll();
-
-        return users.FirstOrDefault(u => u.Email == email);
-            //?? throw new ObjectNotFoundException();
-    }
-
-    private string GenerateAndSaveTokens(User user, HttpContext context)
-    {
-        var accessToken = jwtProvider.GenerateToken(user);
-        var refreshToken = jwtProvider.GenerateToken(user, 168);
+        var accessToken = jwtProvider.GenerateToken(userId);
+        var refreshToken = jwtProvider.GenerateToken(userId, 168);
 
         var options = new CookieOptions
         {
-            HttpOnly = false,
+            HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict
+            SameSite = SameSiteMode.None
         };
 
         context.Response.Cookies.Append("refreshToken", refreshToken, options);

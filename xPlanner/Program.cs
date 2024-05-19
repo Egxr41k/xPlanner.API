@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             {
                 OnMessageReceived = context =>
                 {
-                    context.Token = context.Request.Cookies["tasty-cookies"];
+                    context.Token = context.Request.Cookies["refreshToken"];
 
                     return Task.CompletedTask;
                 }

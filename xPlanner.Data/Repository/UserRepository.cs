@@ -36,9 +36,6 @@ public class UserRepository : IRepository<User>
 
     public async Task<User> Add(User user)
     {
-        user.CreatedAt = DateTime.UtcNow;
-        user.Name = user.Email; // Set name to email by default
-
         await dbContext.Users.AddAsync(user);
         await dbContext.SaveChangesAsync();
 
@@ -49,11 +46,7 @@ public class UserRepository : IRepository<User>
     {
         var existingUser = await GetById(user.Id);
 
-        existingUser.Email = user.Email;
-        existingUser.Password = user.Password;
-        existingUser.LastUpdatedAt = DateTime.UtcNow;
-
-        // Update related entities if necessary (e.g., Tasks, TimeBlocks, Sessions)
+        existingUser = user;
 
         await dbContext.SaveChangesAsync();
 

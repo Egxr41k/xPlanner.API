@@ -10,23 +10,16 @@ public record PomodoroSessionRequest(bool isCompleted);
 public class PomodoroService
 {
     private readonly IRepository<PomodoroSession> repository;
-    private readonly IRepository<User> userRepository;
-    private readonly IJwtProvider jwtProvider;
 
-    public PomodoroService(
-        IRepository<PomodoroSession> repository,
-        IJwtProvider jwtProvider,
-        IRepository<User> userRepository)
+    public PomodoroService(IRepository<PomodoroSession> repository)
     {
         this.repository = repository;
-        this.userRepository = userRepository;
-        this.jwtProvider = jwtProvider;
     }
 
     public async Task<PomodoroSession> GetTodaySession(HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
         var sessions = await repository.GetAll();
 
@@ -36,21 +29,21 @@ public class PomodoroService
 
         todaySession?.Rounds.OrderBy(round => round.Id);
 
-        return todaySession ?? throw new Exception();
+        return todaySession ?? await CreateSession(context);
     }
 
     public async Task<PomodoroSession> CreateSession(HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
-        var user = await userRepository.GetById(userId);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
+        //var user = await userRepository.GetById(userId);
 
         var session = new PomodoroSession()
         {
             UserId = userId,
-            CreatedAt = DateTime.UtcNow,
-            Rounds = CreateOrderedRounds(user.Settings.PomodoroIntervalsCount),
+            //Rounds = CreateOrderedRounds(user?.Settings?.PomodoroIntervalsCount ?? 6),
             IsCompleted = false,
+            CreatedAt = DateTime.UtcNow,
         };
 
         return await repository.Add(session);
@@ -58,7 +51,7 @@ public class PomodoroService
 
     private List<PomodoroRound> CreateOrderedRounds(int length)
     {
-        return new PomodoroRound[length].OrderBy(round => round.Id).ToList();
+        return new PomodoroRound[length].ToList();
     }
 
     public async Task<PomodoroSession> UpdateSession(
@@ -68,6 +61,7 @@ public class PomodoroService
     {
         var existingSession = await repository.GetById(sessionId);
         existingSession.IsCompleted = session.isCompleted;
+        existingSession.LastUpdatedAt = DateTime.UtcNow;
 
         return await repository.Update(existingSession);
     }
@@ -92,7 +86,9 @@ public class PomodoroService
         return await repository.Update(session);
     }
 
-    public async Task<PomodoroSession> DeleteSession(HttpContext context, int sessionId)
+    public async Task<PomodoroSession> DeleteSession(
+        int sessionId,
+        HttpContext context)
     {
         return await repository.Delete(sessionId);
     }

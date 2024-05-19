@@ -48,10 +48,8 @@ public class PomodoroSessionRepository : IRepository<PomodoroSession>
     public async Task<PomodoroSession> Update(PomodoroSession session)
     {
         var existingSession = await GetById(session.Id);
-        
-        existingSession.Rounds = session.Rounds;
-        existingSession.IsCompleted = session.IsCompleted;
-        existingSession.LastUpdatedAt = DateTime.UtcNow;
+
+        existingSession = session;
 
         await dbContext.SaveChangesAsync();
 

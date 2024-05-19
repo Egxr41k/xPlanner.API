@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data.Entity.Core;
-using System.Threading.Tasks;
 using xPlanner.Domain.Entities;
 
 namespace xPlanner.Data.Repository;

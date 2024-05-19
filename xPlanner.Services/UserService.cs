@@ -16,50 +16,98 @@ public record UserRequest (
 public class UserService
 {
     private readonly IRepository<User> repository;
-    private readonly IJwtProvider jwtProvider;
     private readonly IPasswordHasher passwordHasher;
 
-
     public UserService(
-        IRepository<User> userRepository,
-        IJwtProvider jwtProvider,
-        IPasswordHasher passwordHasher) 
+        IRepository<User> repository,
+        IPasswordHasher passwordHasher)
     {
-        repository = userRepository;
-        this.jwtProvider = jwtProvider;
+        this.repository = repository;
         this.passwordHasher = passwordHasher;
     }
 
     public async Task<User> GetUser(HttpContext context)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
-
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
         var user = await repository.GetById(userId);
 
         return user ?? throw new UnauthorizedAccessException();
     }
 
+    public async Task<bool> CheckIfUserExists(string email)
+    {
+        var existingUser = await GetByEmail(email);
+        return existingUser != null;
+    }
+
+    public async Task<User> CreateUser(string email, string password)
+    {
+        var user = new User
+        {
+            Email = email,
+            Password = passwordHasher.Generate(password),
+            Name = email, // Set name to email by default
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await repository.Add(user);
+
+        return user;
+    }
+
+    public async Task<User> GetUserByEmailAndPassword(string email, string password)
+    {
+        var user = await GetByEmail(email);
+
+        if (user == null || !passwordHasher.Verify(password, user.Password))
+        {
+            throw new InvalidOperationException("Invalid email or password.");
+        }
+
+        return user;
+    }
+
+    public async Task<User> GetById(int userId)
+    {
+        return await repository.GetById(userId);
+    }
+
+    public async Task<User?> GetByEmail(string email)
+    {
+        var users = await repository.GetAll();
+
+        return users.FirstOrDefault(u => u.Email == email);
+        //?? throw new ObjectNotFoundException();
+    }
+
     public async Task<User> UpdateUser(HttpContext context, UserRequest user)
     {
-        var refreshToken = context.Request.Cookies["refreshToken"];
+        var userIdClaim = context.User.Claims
+            .FirstOrDefault(claim => claim.Type == "userId");
+        var userId = Convert.ToInt32(userIdClaim?.Value);
 
-        var userId = jwtProvider.GetInfoFromToken(refreshToken);
+        var existingUser = await repository.GetById(userId);
 
-        return await repository.Update(new User()
+        existingUser.Name = user.name;
+        existingUser.Email = user.email;
+        existingUser.Password = passwordHasher.Generate(user.pasword);
+        existingUser.Settings = new UserSettings()
         {
-            Id = userId,
-            Name = user.name,
-            Email = user.email,
-            Password = passwordHasher.Generate(user.pasword),
-            Settings = new UserSettings()
-            {
-                PomodoroWorkInterval = user.workInterval,
-                PomodoroBreakInterval = user.breakInterval,
-                PomodoroIntervalsCount = user.intervalsCount,
-            },
-            LastUpdatedAt = DateTime.UtcNow,
-        });
+            PomodoroWorkInterval = user.workInterval,
+            PomodoroBreakInterval = user.breakInterval,
+            PomodoroIntervalsCount = user.intervalsCount,
+        };
+        existingUser.LastUpdatedAt = DateTime.UtcNow;
+        
+        return await repository.Update(existingUser);
+    }
+
+    public async Task<User> DeleteSession(
+        int userId,
+        HttpContext context)
+    {
+        return await repository.Delete(userId);
     }
 }
