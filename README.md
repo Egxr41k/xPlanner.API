@@ -59,6 +59,6 @@
 [DELETE] user/time-blocks/:id (int id) => (TimeBlock timeBlock)
 
 ### User
-[GET] user/profile () => (string email, string name)
+[GET] user/profile () => (User user, (string, string)[] statistics)
 
-[POST] user/profile (string email, string name, string password, int workInterval, int breakInterval, int intervalsCount) => (User user, (string, string)[] statistics)
+[POST] user/profile (string email, string name, string password, int workInterval, int breakInterval, int intervalsCount) => (string email, string name)
