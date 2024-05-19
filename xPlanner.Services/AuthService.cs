@@ -65,9 +65,10 @@ public class AuthService : IAuthService
         return new AuthResponce(accessToken, user);
     }
 
-    public async Task Logout(HttpContext context)
+    public async Task<bool> Logout(HttpContext context)
     {
         context.Response.Cookies.Delete("refreshToken");
+        return true;
     }
 
     private string GenerateAndSaveTokens(int userId, HttpContext context)

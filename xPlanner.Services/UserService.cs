@@ -13,6 +13,10 @@ public record UserRequest (
     int breakInterval,
     int intervalsCount);
 
+public record Data(string label, string value);
+public record MyProfileResponse(User user, Data[] statistics);
+public record UpdatedUserResponse(string email, string name);
+
 public class UserService
 {
     private readonly IRepository<User> repository;
@@ -26,14 +30,43 @@ public class UserService
         this.passwordHasher = passwordHasher;
     }
 
-    public async Task<User> GetUser(HttpContext context)
+    public async Task<MyProfileResponse> GetUser(HttpContext context)
     {
         var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
         var userId = Convert.ToInt32(userIdClaim?.Value);
 
         var user = await repository.GetById(userId);
 
-        return user ?? throw new UnauthorizedAccessException();
+        var statistics = await GetStatistics(user);
+
+        return new MyProfileResponse(user, statistics);
+    }
+
+    public async Task<Data[]> GetStatistics(User user)
+    {
+        var totalTasks = user.Tasks.Count;
+
+        var completedTasks = user.Tasks
+            .Where(task => task.IsCompleted)
+            .ToList()
+            .Count;
+
+        var todayTasks = user.Tasks
+            .Where(task => task.CreatedAt.Day == DateTime.Today.Day)
+            .ToList()
+            .Count;
+
+        var weekTasks = user.Tasks
+            .Where(task => task.CreatedAt.AddDays(7) > DateTime.Today)
+            .ToList()
+            .Count;
+
+        return [
+            new Data("Total", totalTasks.ToString()),
+            new Data("Completed tasks", completedTasks.ToString()),
+            new Data("Today tasks", todayTasks.ToString()),
+            new Data("Week tasks", weekTasks.ToString()),
+        ];
     }
 
     public async Task<bool> CheckIfUserExists(string email)
@@ -82,7 +115,7 @@ public class UserService
         //?? throw new ObjectNotFoundException();
     }
 
-    public async Task<User> UpdateUser(HttpContext context, UserRequest user)
+    public async Task<UpdatedUserResponse> UpdateUser(HttpContext context, UserRequest user)
     {
         var userIdClaim = context.User.Claims
             .FirstOrDefault(claim => claim.Type == "userId");
@@ -101,7 +134,9 @@ public class UserService
         };
         existingUser.LastUpdatedAt = DateTime.UtcNow;
         
-        return await repository.Update(existingUser);
+        await repository.Update(existingUser);
+
+        return new UpdatedUserResponse(existingUser.Email, existingUser.Name);
     }
 
     public async Task<User> DeleteSession(

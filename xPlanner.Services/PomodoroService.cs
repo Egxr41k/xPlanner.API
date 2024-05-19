@@ -66,7 +66,7 @@ public class PomodoroService
         return await repository.Update(existingSession);
     }
 
-    public async Task<PomodoroSession> UpdateRound(
+    public async Task<PomodoroRound> UpdateRound(
         int roundId,
         HttpContext context,
         PomodoroRoundRequest round)
@@ -83,7 +83,9 @@ public class PomodoroService
 
         session.Rounds.Add(existingRound);
 
-        return await repository.Update(session);
+        await repository.Update(session);
+        
+        return existingRound;
     }
 
     public async Task<PomodoroSession> DeleteSession(
