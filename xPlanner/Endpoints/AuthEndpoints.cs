@@ -29,6 +29,7 @@ public static class AuthEndpoints
         var result = await service.Login(request, context);
         return Results.Ok(result);
     }
+
     private static async Task<IResult> AccessTokenHandler(
         AuthService service,
         HttpContext context)

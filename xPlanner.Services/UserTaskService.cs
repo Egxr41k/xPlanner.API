@@ -27,9 +27,8 @@ public class UserTaskService
 
         var tasks = await repository.GetAll();
 
-        //TODO: fix data type at UserTask.UserId. string => int
         return tasks
-            .Where(task => task.UserId == userId.ToString())
+            .Where(task => task.UserId == userId)
             .ToList();
     }
 
@@ -42,8 +41,7 @@ public class UserTaskService
 
         var task = new UserTask()
         {
-            //TODO: fix data type at UserTask.UserId. string => int
-            UserId = userId.ToString(),
+            UserId = userId,
             Name = userTask.name,
             IsCompleted = userTask.isCompleted,
             CreatedAt = DateTime.UtcNow, //userTask.createdAt,

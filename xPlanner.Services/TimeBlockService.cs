@@ -29,9 +29,8 @@ public class TimeBlockService
 
         var timeBlock = await repository.GetAll();
 
-        //TODO: fix data type at TimeBlock.UserId. string => int
         return timeBlock
-            .Where(timeBlock => timeBlock.UserId == userId.ToString())
+            .Where(timeBlock => timeBlock.UserId == userId)
             .ToList();
     } 
 
@@ -43,7 +42,7 @@ public class TimeBlockService
 
         return await repository.Add(new TimeBlock()
         {
-            UserId = userId.ToString(),
+            UserId = userId,
             Name = timeBlock.name,
             Duration = timeBlock.duration,
             Order = timeBlock.order,

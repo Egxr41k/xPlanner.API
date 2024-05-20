@@ -110,16 +110,12 @@ namespace xPlanner.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("UserId1")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("TimeBlocks");
                 });
@@ -208,16 +204,12 @@ namespace xPlanner.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("UserId1")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Tasks");
                 });
@@ -242,7 +234,9 @@ namespace xPlanner.Data.Migrations
                 {
                     b.HasOne("xPlanner.Domain.Entities.User", null)
                         .WithMany("TimeBlocks")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("xPlanner.Domain.Entities.UserSettings", b =>
@@ -258,7 +252,9 @@ namespace xPlanner.Data.Migrations
                 {
                     b.HasOne("xPlanner.Domain.Entities.User", null)
                         .WithMany("Tasks")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("xPlanner.Domain.Entities.PomodoroSession", b =>

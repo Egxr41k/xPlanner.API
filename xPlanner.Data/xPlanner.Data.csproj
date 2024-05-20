@@ -24,4 +24,8 @@
     <ProjectReference Include="..\xPlanner.Domain\xPlanner.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
