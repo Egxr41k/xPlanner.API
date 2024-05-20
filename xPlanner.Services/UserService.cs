@@ -83,6 +83,13 @@ public class UserService
             Password = passwordHasher.Generate(password),
             Name = email, // Set name to email by default
             CreatedAt = DateTime.UtcNow,
+
+            Settings = new UserSettings() // setting default settings
+            {
+                PomodoroBreakInterval = 10,
+                PomodoroIntervalsCount = 7,
+                PomodoroWorkInterval = 50,
+            }
         };
 
         await repository.Add(user);

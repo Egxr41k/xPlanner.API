@@ -16,6 +16,7 @@ public class PomodoroSessionRepository : IRepository<PomodoroSession>
     public async Task<PomodoroSession> Add(PomodoroSession session)
     {
         await dbContext.PomodoroSessions.AddAsync(session);
+        await dbContext.PomodoroRounds.AddRangeAsync(session.Rounds);
         await dbContext.SaveChangesAsync();
 
         return session;
@@ -26,6 +27,7 @@ public class PomodoroSessionRepository : IRepository<PomodoroSession>
         var session = await GetById(id);
 
         dbContext.PomodoroSessions.Remove(session);
+        dbContext.PomodoroRounds.RemoveRange(session.Rounds);
         await dbContext.SaveChangesAsync();
 
         return session;
@@ -34,7 +36,8 @@ public class PomodoroSessionRepository : IRepository<PomodoroSession>
     public async Task<List<PomodoroSession>> GetAll()
     {
         return await dbContext.PomodoroSessions
-            .Include(s => s.Rounds).ToListAsync();
+            .Include(s => s.Rounds)
+            .ToListAsync();
     }
 
     public async Task<PomodoroSession> GetById(int id)
@@ -49,7 +52,16 @@ public class PomodoroSessionRepository : IRepository<PomodoroSession>
     {
         var existingSession = await GetById(session.Id);
 
+        await dbContext.PomodoroRounds
+            .Where(round => round.SessionId == session.Id)
+            .ForEachAsync(round => round = session.Rounds
+                .FirstOrDefault(newRound => round.Id == newRound.Id)!);
+
         existingSession = session;
+
+        existingSession.Rounds = await dbContext.PomodoroRounds
+            .Where(round => round.SessionId == session.Id)
+            .ToListAsync();
 
         await dbContext.SaveChangesAsync();
 

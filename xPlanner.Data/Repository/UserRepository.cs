@@ -37,6 +37,7 @@ public class UserRepository : IRepository<User>
     public async Task<User> Add(User user)
     {
         await dbContext.Users.AddAsync(user);
+        await dbContext.UsersSettings.AddAsync(user.Settings);
         await dbContext.SaveChangesAsync();
 
         return user;
@@ -48,6 +49,13 @@ public class UserRepository : IRepository<User>
 
         existingUser = user;
 
+        var existingSettings = await dbContext.UsersSettings
+            .FirstOrDefaultAsync(settings => settings.Id == existingUser.Settings.UserId);
+
+        existingSettings = user.Settings;
+
+        existingUser.Settings = existingSettings;
+
         await dbContext.SaveChangesAsync();
 
         return existingUser;
@@ -58,6 +66,7 @@ public class UserRepository : IRepository<User>
         var user = await GetById(id);
 
         dbContext.Users.Remove(user);
+        dbContext.UsersSettings.Remove(user.Settings);
         await dbContext.SaveChangesAsync();
 
         return user;
