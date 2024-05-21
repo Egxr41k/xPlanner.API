@@ -11,7 +11,15 @@ public record UserTaskRequest(
     string createdAt, 
     string priority);
 
-public class UserTaskService
+public interface IUserTaskService
+{
+    Task<UserTask> CreateTask(UserTaskRequest userTask, HttpContext context);
+    Task<UserTask> DeleteTask(int id, HttpContext context);
+    Task<List<UserTask>> GetTasks(HttpContext context);
+    Task<UserTask> UpdateTask(int id, UserTaskRequest userTask, HttpContext context);
+}
+
+public class UserTaskService : IUserTaskService
 {
     private readonly IRepository<UserTask> repository;
 
@@ -52,8 +60,8 @@ public class UserTaskService
     }
 
     public async Task<UserTask> UpdateTask(
-        int id, 
-        UserTaskRequest userTask, 
+        int id,
+        UserTaskRequest userTask,
         HttpContext context)
     {
         var task = await repository.GetById(id);
@@ -67,7 +75,7 @@ public class UserTaskService
     }
 
     public async Task<UserTask> DeleteTask(
-        int id, 
+        int id,
         HttpContext context)
     {
         return await repository.Delete(id);

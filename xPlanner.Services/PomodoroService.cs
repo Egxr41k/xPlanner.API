@@ -7,7 +7,17 @@ namespace xPlanner.Services;
 
 public record PomodoroRoundRequest(int totalSeconds, bool isCompleted);
 public record PomodoroSessionRequest(bool isCompleted);
-public class PomodoroService
+
+public interface IPomodoroService
+{
+    Task<PomodoroSession> CreateSession(HttpContext context);
+    Task<PomodoroSession> DeleteSession(int sessionId, HttpContext context);
+    Task<PomodoroSession> GetTodaySession(HttpContext context);
+    Task<PomodoroRound> UpdateRound(int roundId, HttpContext context, PomodoroRoundRequest round);
+    Task<PomodoroSession> UpdateSession(int sessionId, HttpContext context, PomodoroSessionRequest session);
+}
+
+public class PomodoroService : IPomodoroService
 {
     private readonly IRepository<PomodoroSession> repository;
 
@@ -84,7 +94,7 @@ public class PomodoroService
         session.Rounds.Add(existingRound);
 
         await repository.Update(session);
-        
+
         return existingRound;
     }
 

@@ -59,11 +59,11 @@ builder.Services.AddScoped<IRepository<TimeBlock>, TimeBlockRepository>();
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IRepository<UserTask>, UserTaskRepository>();
 
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<PomodoroService>();
-builder.Services.AddScoped<TimeBlockService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<UserTaskService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPomodoroService, PomodoroService>();
+builder.Services.AddScoped<ITimeBlockService, TimeBlockService>();
+builder.Services.AddScoped<IUserService, UserService > ();
+builder.Services.AddScoped<IUserTaskService, UserTaskService>();
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();

@@ -13,7 +13,16 @@ public record TimeBlockRequest(
 
 public record UpdateOrderRequest(string[] ids);
 
-public class TimeBlockService
+public interface ITimeBlockService
+{
+    Task<TimeBlock> CreateTimeBlock(HttpContext context, TimeBlockRequest timeBlock);
+    Task<TimeBlock> DeleteTimeBlock(int id);
+    Task<List<TimeBlock>> GetTimeBlocks(HttpContext context);
+    Task<TimeBlock> UpdateTimeBlock(int id, HttpContext context, TimeBlockRequest timeBlock);
+    Task<List<TimeBlock>> UpdateTimeBlocksOrder(HttpContext context, UpdateOrderRequest updateOrder);
+}
+
+public class TimeBlockService : ITimeBlockService
 {
     private readonly IRepository<TimeBlock> repository;
 
@@ -32,7 +41,7 @@ public class TimeBlockService
         return timeBlock
             .Where(timeBlock => timeBlock.UserId == userId)
             .ToList();
-    } 
+    }
 
     public async Task<TimeBlock> CreateTimeBlock(HttpContext context,
         TimeBlockRequest timeBlock)
@@ -66,10 +75,10 @@ public class TimeBlockService
     }
 
     public async Task<List<TimeBlock>> UpdateTimeBlocksOrder(
-        HttpContext context, 
+        HttpContext context,
         UpdateOrderRequest updateOrder)
     {
-        var timeBlocks = await GetTimeBlocks(context); 
+        var timeBlocks = await GetTimeBlocks(context);
 
         for (int i = 0; i < timeBlocks.Count; i++)
         {

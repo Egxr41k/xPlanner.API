@@ -17,7 +17,20 @@ public record Data(string label, string value);
 public record MyProfileResponse(User user, Data[] statistics);
 public record UpdatedUserResponse(string email, string name);
 
-public class UserService
+public interface IUserService
+{
+    Task<bool> CheckIfUserExists(string email);
+    Task<User> CreateUser(string email, string password);
+    Task<User> DeleteSession(int userId, HttpContext context);
+    Task<User?> GetByEmail(string email);
+    Task<User> GetById(int userId);
+    Task<Data[]> GetStatistics(User user);
+    Task<MyProfileResponse> GetUser(HttpContext context);
+    Task<User> GetUserByEmailAndPassword(string email, string password);
+    Task<UpdatedUserResponse> UpdateUser(HttpContext context, UserRequest user);
+}
+
+public class UserService : IUserService
 {
     private readonly IRepository<User> repository;
     private readonly IPasswordHasher passwordHasher;
@@ -140,7 +153,7 @@ public class UserService
             PomodoroIntervalsCount = user.intervalsCount,
         };
         existingUser.LastUpdatedAt = DateTime.UtcNow;
-        
+
         await repository.Update(existingUser);
 
         return new UpdatedUserResponse(existingUser.Email, existingUser.Name);

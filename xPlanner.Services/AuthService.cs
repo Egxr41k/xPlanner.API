@@ -17,11 +17,11 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    private readonly UserService userService;
+    private readonly IUserService userService;
     private readonly IJwtProvider jwtProvider;
 
     public AuthService(
-        UserService userService,
+        IUserService userService,
         IJwtProvider jwtProvider)
     {
         this.userService = userService;
