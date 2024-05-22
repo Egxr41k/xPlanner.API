@@ -18,7 +18,9 @@ public static class TimeBlockEndpoints
         HttpContext context,
         TimeBlockService service)
     {
-        var result = await service.DeleteTimeBlock(id);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.DeleteTimeBlock(id, userId);
         return Results.Ok(result);
     }
 
@@ -27,7 +29,9 @@ public static class TimeBlockEndpoints
         HttpContext context,
         TimeBlockService service)
     {
-        var result = await service.UpdateTimeBlocksOrder(context, orderRequest);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.UpdateTimeBlocksOrder(orderRequest, userId);
         return Results.Ok(result);
     }
 
@@ -37,7 +41,9 @@ public static class TimeBlockEndpoints
         HttpContext context,
         TimeBlockService service)
     {
-        var result = await service.UpdateTimeBlock(id, context, timeBlock);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.UpdateTimeBlock(id, timeBlock, userId);
         return Results.Ok(result);
     }
 
@@ -46,7 +52,9 @@ public static class TimeBlockEndpoints
         HttpContext context,
         TimeBlockService service)
     {
-        var result = await service.CreateTimeBlock(context, timeBlock);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.CreateTimeBlock(timeBlock, userId);
         return Results.Ok(result);
     }
 
@@ -54,7 +62,11 @@ public static class TimeBlockEndpoints
         HttpContext context,
         TimeBlockService service)
     {
-        var result = await service.GetTimeBlocks(context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.GetTimeBlocks(userId);
         return Results.Ok(result);
     }
+
+
 }

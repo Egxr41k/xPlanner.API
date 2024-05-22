@@ -1,4 +1,5 @@
-﻿using xPlanner.Services;
+﻿using xPlanner.Domain.Entities;
+using xPlanner.Services;
 
 namespace xPlanner.Endpoints;
 
@@ -18,7 +19,9 @@ public static class PomodoroEndpoints
         HttpContext context,
         PomodoroService service)
     {
-        var result = await service.DeleteSession(id, context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.DeleteSession(id, userId);
         return Results.Ok(result);
     }
 
@@ -28,7 +31,9 @@ public static class PomodoroEndpoints
         PomodoroService service,
         PomodoroSessionRequest session)
     {
-        var result = await service.UpdateSession(id, context, session);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.UpdateSession(id, session, userId);
         return Results.Ok(result);
     }
 
@@ -38,7 +43,9 @@ public static class PomodoroEndpoints
         PomodoroService service,
         PomodoroRoundRequest round)
     {
-        var result = await service.UpdateRound(id, context, round);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.UpdateRound(id, round, userId);
         return Results.Ok(result);
     }
 
@@ -46,7 +53,9 @@ public static class PomodoroEndpoints
         HttpContext context,
         PomodoroService service)
     {
-        var result = await service.CreateSession(context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.CreateSession(userId);
         return Results.Ok(result);
     }
 
@@ -54,7 +63,9 @@ public static class PomodoroEndpoints
         HttpContext context,
         PomodoroService service)
     {
-        var result = await service.GetTodaySession(context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.GetTodaySession(userId);
         return Results.Ok(result);
     }
 }

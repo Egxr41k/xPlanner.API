@@ -10,11 +10,11 @@ public record PomodoroSessionRequest(bool isCompleted);
 
 public interface IPomodoroService
 {
-    Task<PomodoroSession> CreateSession(HttpContext context);
-    Task<PomodoroSession> DeleteSession(int sessionId, HttpContext context);
-    Task<PomodoroSession> GetTodaySession(HttpContext context);
-    Task<PomodoroRound> UpdateRound(int roundId, HttpContext context, PomodoroRoundRequest round);
-    Task<PomodoroSession> UpdateSession(int sessionId, HttpContext context, PomodoroSessionRequest session);
+    Task<PomodoroSession> CreateSession(int userId);
+    Task<PomodoroSession> DeleteSession(int sessionId, int userId);
+    Task<PomodoroSession> GetTodaySession(int userId);
+    Task<PomodoroRound> UpdateRound(int roundId, PomodoroRoundRequest round,int userId);
+    Task<PomodoroSession> UpdateSession(int sessionId, PomodoroSessionRequest session, int userId);
 }
 
 public class PomodoroService : IPomodoroService
@@ -26,11 +26,9 @@ public class PomodoroService : IPomodoroService
         this.repository = repository;
     }
 
-    public async Task<PomodoroSession> GetTodaySession(HttpContext context)
+    public async Task<PomodoroSession> GetTodaySession(
+        int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         var sessions = await repository.GetAll();
 
         var todaySession = sessions.FirstOrDefault(session =>
@@ -39,15 +37,12 @@ public class PomodoroService : IPomodoroService
 
         todaySession?.Rounds.OrderBy(round => round.Id);
 
-        return todaySession ?? await CreateSession(context);
+        return todaySession ?? await CreateSession(userId);
     }
 
-    public async Task<PomodoroSession> CreateSession(HttpContext context)
+    public async Task<PomodoroSession> CreateSession(
+        int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-        //var user = await userRepository.GetById(userId);
-
         var session = new PomodoroSession()
         {
             UserId = userId,
@@ -66,8 +61,8 @@ public class PomodoroService : IPomodoroService
 
     public async Task<PomodoroSession> UpdateSession(
         int sessionId,
-        HttpContext context,
-        PomodoroSessionRequest session)
+        PomodoroSessionRequest session,
+        int userId)
     {
         var existingSession = await repository.GetById(sessionId);
         existingSession.IsCompleted = session.isCompleted;
@@ -78,10 +73,10 @@ public class PomodoroService : IPomodoroService
 
     public async Task<PomodoroRound> UpdateRound(
         int roundId,
-        HttpContext context,
-        PomodoroRoundRequest round)
+        PomodoroRoundRequest round,
+        int userId)
     {
-        var session = await GetTodaySession(context);
+        var session = await GetTodaySession(userId);
 
         var existingRound = session.Rounds
             .FirstOrDefault(round => round.Id == roundId);
@@ -100,7 +95,7 @@ public class PomodoroService : IPomodoroService
 
     public async Task<PomodoroSession> DeleteSession(
         int sessionId,
-        HttpContext context)
+        int userId)
     {
         return await repository.Delete(sessionId);
     }

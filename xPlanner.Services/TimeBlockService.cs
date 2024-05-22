@@ -15,11 +15,11 @@ public record UpdateOrderRequest(string[] ids);
 
 public interface ITimeBlockService
 {
-    Task<TimeBlock> CreateTimeBlock(HttpContext context, TimeBlockRequest timeBlock);
-    Task<TimeBlock> DeleteTimeBlock(int id);
-    Task<List<TimeBlock>> GetTimeBlocks(HttpContext context);
-    Task<TimeBlock> UpdateTimeBlock(int id, HttpContext context, TimeBlockRequest timeBlock);
-    Task<List<TimeBlock>> UpdateTimeBlocksOrder(HttpContext context, UpdateOrderRequest updateOrder);
+    Task<TimeBlock> CreateTimeBlock(TimeBlockRequest timeBlock, int userId);
+    Task<TimeBlock> DeleteTimeBlock(int id, int userId);
+    Task<List<TimeBlock>> GetTimeBlocks(int userId);
+    Task<TimeBlock> UpdateTimeBlock(int id, TimeBlockRequest timeBlock, int userId);
+    Task<List<TimeBlock>> UpdateTimeBlocksOrder(UpdateOrderRequest updateOrderm, int userId);
 }
 
 public class TimeBlockService : ITimeBlockService
@@ -31,11 +31,9 @@ public class TimeBlockService : ITimeBlockService
         this.repository = repository;
     }
 
-    public async Task<List<TimeBlock>> GetTimeBlocks(HttpContext context)
+    public async Task<List<TimeBlock>> GetTimeBlocks(
+        int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         var timeBlock = await repository.GetAll();
 
         return timeBlock
@@ -43,12 +41,10 @@ public class TimeBlockService : ITimeBlockService
             .ToList();
     }
 
-    public async Task<TimeBlock> CreateTimeBlock(HttpContext context,
-        TimeBlockRequest timeBlock)
+    public async Task<TimeBlock> CreateTimeBlock(
+        TimeBlockRequest timeBlock,
+        int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         return await repository.Add(new TimeBlock()
         {
             UserId = userId,
@@ -60,8 +56,8 @@ public class TimeBlockService : ITimeBlockService
 
     public async Task<TimeBlock> UpdateTimeBlock(
         int id,
-        HttpContext context,
-        TimeBlockRequest timeBlock)
+        TimeBlockRequest timeBlock,
+        int userId)
     {
         var existingTimeBlock = await repository.GetById(id);
 
@@ -75,10 +71,10 @@ public class TimeBlockService : ITimeBlockService
     }
 
     public async Task<List<TimeBlock>> UpdateTimeBlocksOrder(
-        HttpContext context,
-        UpdateOrderRequest updateOrder)
+        UpdateOrderRequest updateOrder, 
+        int userId)
     {
-        var timeBlocks = await GetTimeBlocks(context);
+        var timeBlocks = await GetTimeBlocks(userId);
 
         for (int i = 0; i < timeBlocks.Count; i++)
         {
@@ -90,7 +86,9 @@ public class TimeBlockService : ITimeBlockService
         return timeBlocks;
     }
 
-    public async Task<TimeBlock> DeleteTimeBlock(int id)
+    public async Task<TimeBlock> DeleteTimeBlock(
+        int id,
+        int userId)
     {
         return await repository.Delete(id);
     }

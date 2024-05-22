@@ -1,4 +1,5 @@
-﻿using xPlanner.Services;
+﻿using xPlanner.Domain.Entities;
+using xPlanner.Services;
 
 namespace xPlanner.Endpoints;
 
@@ -17,7 +18,9 @@ public static class UserEndpoits
         UserService service,
         HttpContext context)
     {
-        var result = await service.GetUser(context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.GetUser(userId);
         return Results.Ok(result);
     }
 
@@ -26,7 +29,9 @@ public static class UserEndpoits
         UserService service,
         HttpContext context)
     {
-        var result = await service.GetUser(context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.GetUser(userId);
         return Results.Ok(result);
     }
 
@@ -42,7 +47,9 @@ public static class UserEndpoits
         UserRequest user,
         HttpContext context)
     {
-        var result = await service.UpdateUser(context, user);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.UpdateUser(user, userId);
         return Results.Ok(result);
     }
 

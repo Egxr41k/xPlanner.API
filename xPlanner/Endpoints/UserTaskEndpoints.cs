@@ -17,7 +17,9 @@ public static class UserTaskEndpoints
         HttpContext context,
         UserTaskService service)
     {
-        var result = await service.DeleteTask(id, context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.DeleteTask(id, userId);
         return Results.Ok(result);
     }
 
@@ -27,7 +29,9 @@ public static class UserTaskEndpoints
         HttpContext context,
         UserTaskService service)
     {
-        var result = await service.UpdateTask(id, userTask, context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.UpdateTask(id, userTask, userId);
         return Results.Ok(result);
     }
 
@@ -36,7 +40,9 @@ public static class UserTaskEndpoints
         HttpContext context,
         UserTaskService service)
     {
-        var result = await service.CreateTask(userTask, context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.CreateTask(userTask, userId);
         return Results.Ok(result);
     }
 
@@ -44,7 +50,9 @@ public static class UserTaskEndpoints
         HttpContext context,
         UserTaskService service)
     {
-        var result = await service.GetTasks(context);
+        var userId = Helpers.GetUserIdFromContext(context);
+
+        var result = await service.GetTasks(userId);
         return Results.Ok(result);
     }
 }

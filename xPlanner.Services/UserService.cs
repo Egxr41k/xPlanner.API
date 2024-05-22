@@ -21,13 +21,13 @@ public interface IUserService
 {
     Task<bool> CheckIfUserExists(string email);
     Task<User> CreateUser(string email, string password);
-    Task<User> DeleteSession(int userId, HttpContext context);
+    Task<User> DeleteUser(int userId);
     Task<User?> GetByEmail(string email);
     Task<User> GetById(int userId);
     Task<Data[]> GetStatistics(User user);
-    Task<MyProfileResponse> GetUser(HttpContext context);
+    Task<MyProfileResponse> GetUser(int userId);
     Task<User> GetUserByEmailAndPassword(string email, string password);
-    Task<UpdatedUserResponse> UpdateUser(HttpContext context, UserRequest user);
+    Task<UpdatedUserResponse> UpdateUser(UserRequest user, int userId);
 }
 
 public class UserService : IUserService
@@ -43,11 +43,9 @@ public class UserService : IUserService
         this.passwordHasher = passwordHasher;
     }
 
-    public async Task<MyProfileResponse> GetUser(HttpContext context)
+    public async Task<MyProfileResponse> GetUser(
+        int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         var user = await repository.GetById(userId);
 
         var statistics = await GetStatistics(user);
@@ -135,12 +133,10 @@ public class UserService : IUserService
         //?? throw new ObjectNotFoundException();
     }
 
-    public async Task<UpdatedUserResponse> UpdateUser(HttpContext context, UserRequest user)
+    public async Task<UpdatedUserResponse> UpdateUser(
+        UserRequest user, 
+        int userId)
     {
-        var userIdClaim = context.User.Claims
-            .FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         var existingUser = await repository.GetById(userId);
 
         existingUser.Name = user.name;
@@ -159,9 +155,8 @@ public class UserService : IUserService
         return new UpdatedUserResponse(existingUser.Email, existingUser.Name);
     }
 
-    public async Task<User> DeleteSession(
-        int userId,
-        HttpContext context)
+    public async Task<User> DeleteUser(
+        int userId)
     {
         return await repository.Delete(userId);
     }

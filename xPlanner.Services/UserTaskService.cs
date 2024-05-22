@@ -13,10 +13,10 @@ public record UserTaskRequest(
 
 public interface IUserTaskService
 {
-    Task<UserTask> CreateTask(UserTaskRequest userTask, HttpContext context);
-    Task<UserTask> DeleteTask(int id, HttpContext context);
-    Task<List<UserTask>> GetTasks(HttpContext context);
-    Task<UserTask> UpdateTask(int id, UserTaskRequest userTask, HttpContext context);
+    Task<UserTask> CreateTask(UserTaskRequest userTask, int userId);
+    Task<UserTask> DeleteTask(int id, int userId);
+    Task<List<UserTask>> GetTasks(int userId);
+    Task<UserTask> UpdateTask(int id, UserTaskRequest userTask, int userId);
 }
 
 public class UserTaskService : IUserTaskService
@@ -28,7 +28,7 @@ public class UserTaskService : IUserTaskService
         this.repository = repository;
     }
 
-    public async Task<List<UserTask>> GetTasks(HttpContext context)
+    public async Task<List<UserTask>> GetTasks(int userId)
     {
         var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
         var userId = Convert.ToInt32(userIdClaim?.Value);
@@ -42,7 +42,7 @@ public class UserTaskService : IUserTaskService
 
     public async Task<UserTask> CreateTask(
         UserTaskRequest userTask,
-        HttpContext context)
+        int userId)
     {
         var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
         var userId = Convert.ToInt32(userIdClaim?.Value);
@@ -62,7 +62,7 @@ public class UserTaskService : IUserTaskService
     public async Task<UserTask> UpdateTask(
         int id,
         UserTaskRequest userTask,
-        HttpContext context)
+        int userId)
     {
         var task = await repository.GetById(id);
 
@@ -76,7 +76,7 @@ public class UserTaskService : IUserTaskService
 
     public async Task<UserTask> DeleteTask(
         int id,
-        HttpContext context)
+        int userId)
     {
         return await repository.Delete(id);
     }
