@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using xPlanner.Auth;
-using xPlanner.Data.Repository;
+﻿using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
 
 namespace xPlanner.Services;
@@ -30,9 +28,6 @@ public class UserTaskService : IUserTaskService
 
     public async Task<List<UserTask>> GetTasks(int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         var tasks = await repository.GetAll();
 
         return tasks
@@ -44,9 +39,6 @@ public class UserTaskService : IUserTaskService
         UserTaskRequest userTask,
         int userId)
     {
-        var userIdClaim = context.User.Claims.FirstOrDefault(claim => claim.Type == "userId");
-        var userId = Convert.ToInt32(userIdClaim?.Value);
-
         var task = new UserTask()
         {
             UserId = userId,

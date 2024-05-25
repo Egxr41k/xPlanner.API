@@ -19,46 +19,80 @@ namespace xPlanner.Tests
 
         public UserServiceTest()
         {
-            var dbContext = InMemmoryDbContext.Create(); 
+            var dbContext = InMemmoryDbContext.Create();
+            var hasher = new PasswordHasher();
+            dbContext.Users.Add(new User
+            {
+                Id = ExistingUserId,
+                CreatedAt = DateTime.UtcNow,
+                Email = "testEmail@test.com",
+                Name = "testEmail@test.com",
+                Password = hasher.Generate("password")
+            });
+            dbContext.SaveChanges();
+
             var repository = new UserRepository(dbContext);
             userService = new UserService(repository, new PasswordHasher());
         }
 
         [Fact]
-        public async Task GetAllUsers_before_initialization_should_return_null()
+        public async Task GetAll_BeforeInitialization_ReturnsEmptyList()
         {
             // Arrange
 
-
             // Act
-            
-            // Aseert
+
+            // Assert
 
         }
 
         [Fact]
-        public async Task GetNotExistingUsers_Should_Reurns_Null()
+        public async Task GetById_GivenNotExisted_ReturnsNull()
         {
             // Arrange
 
             // Act
             MyProfileResponse result = await userService.GetUser(NotExistingUserId);
 
-            // Aseert
+            // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task GetExistingUser_Should_Returns_User()
+        public async Task Add_GivenNotExisted_ReturnsUser()
+        {
+            // Arrange
+
+            // Act
+            var result = await userService.CreateUser("testEmail@test.com", "password");
+            ExistingUserId = result.Id;
+
+            // Assert
+            Assert.IsType<User>(result);
+        }
+
+        [Fact]
+        public async Task Add_GivenExisted_ReturnsNull()
+        {
+            // Arrange
+
+            // Act
+            var result = await userService.CreateUser("testEmail@test.com", "password");
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetById_GivenExisted_ReturnsUser()
         {
             // Arrange
 
             // Act
             MyProfileResponse? result = await userService.GetUser(ExistingUserId);
 
-            // Aseert
+            // Assert
             Assert.IsType<MyProfileResponse>(result);
-            // дизайн символика внешний вид персонала
         }
     }
 }

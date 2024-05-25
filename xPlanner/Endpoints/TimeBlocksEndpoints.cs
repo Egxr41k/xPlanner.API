@@ -16,7 +16,7 @@ public static class TimeBlockEndpoints
     private static async Task<IResult> DeleteTimeBlock(
         int id,
         HttpContext context,
-        TimeBlockService service)
+        ITimeBlockService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -27,7 +27,7 @@ public static class TimeBlockEndpoints
     private static async Task<IResult> UpdateOrder(
         UpdateOrderRequest orderRequest,
         HttpContext context,
-        TimeBlockService service)
+        ITimeBlockService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -39,7 +39,7 @@ public static class TimeBlockEndpoints
         int id,
         TimeBlockRequest timeBlock,
         HttpContext context,
-        TimeBlockService service)
+        ITimeBlockService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -50,7 +50,7 @@ public static class TimeBlockEndpoints
     private static async Task<IResult> CreateTimeBlock(
         TimeBlockRequest timeBlock,
         HttpContext context,
-        TimeBlockService service)
+        ITimeBlockService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -60,7 +60,7 @@ public static class TimeBlockEndpoints
 
     private static async Task<IResult> GetTimeBlocks(
         HttpContext context,
-        TimeBlockService service)
+        ITimeBlockService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 

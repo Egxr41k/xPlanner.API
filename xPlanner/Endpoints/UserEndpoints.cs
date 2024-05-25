@@ -15,7 +15,7 @@ public static class UserEndpoits
     }
 
     private static async Task<IResult> GetUser(
-        UserService service,
+        IUserService service,
         HttpContext context)
     {
         var userId = Helpers.GetUserIdFromContext(context);
@@ -26,7 +26,7 @@ public static class UserEndpoits
 
     private static async Task<IResult> GetUsersById(
         int id,
-        UserService service,
+        IUserService service,
         HttpContext context)
     {
         var userId = Helpers.GetUserIdFromContext(context);
@@ -43,7 +43,7 @@ public static class UserEndpoits
 
     private static async Task<IResult> UpdateUser(
         int id,
-        UserService service,
+        IUserService service,
         UserRequest user,
         HttpContext context)
     {
