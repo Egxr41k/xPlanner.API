@@ -8,7 +8,7 @@ public static class UserTaskEndpoints
     {
         app.MapGet("api/user/tasks", GetTasks);
         app.MapPost("api/user/tasks", CreateTask);
-        app.MapPut("api/user/tasks{id:int}", UpdateTask);
+        app.MapPut("api/user/tasks/{id:int}", UpdateTask);
         app.MapDelete("api/user/tasks/{id:int}", DeleteTask);
     }
 

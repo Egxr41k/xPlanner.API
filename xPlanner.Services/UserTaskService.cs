@@ -45,7 +45,7 @@ public class UserTaskService : IUserTaskService
             Name = userTask.name,
             IsCompleted = userTask.isCompleted,
             CreatedAt = DateTime.UtcNow, //userTask.createdAt,
-            Priority = userTask.priority
+            Priority = userTask.priority ?? "low"
         };
 
         return await repository.Add(task);

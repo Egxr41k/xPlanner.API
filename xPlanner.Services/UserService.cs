@@ -5,7 +5,7 @@ using xPlanner.Domain.Entities;
 
 namespace xPlanner.Services;
 
-public record UserRequest (
+public record UserDto (
     string name, 
     string email, 
     string pasword,
@@ -14,7 +14,7 @@ public record UserRequest (
     int intervalsCount);
 
 public record Data(string label, string value);
-public record MyProfileResponse(User user, Data[] statistics);
+public record MyProfileResponse(UserDto user, Data[] statistics);
 public record UpdatedUserResponse(string email, string name);
 
 public interface IUserService
@@ -27,7 +27,7 @@ public interface IUserService
     Task<Data[]> GetStatistics(User user);
     Task<MyProfileResponse> GetUser(int userId);
     Task<User> GetUserByEmailAndPassword(string email, string password);
-    Task<UpdatedUserResponse> UpdateUser(UserRequest user, int userId);
+    Task<UpdatedUserResponse> UpdateUser(UserDto user, int userId);
 }
 
 public class UserService : IUserService
@@ -50,7 +50,15 @@ public class UserService : IUserService
 
         var statistics = await GetStatistics(user);
 
-        return new MyProfileResponse(user, statistics);
+        return new MyProfileResponse(
+            new UserDto(
+                user.Name, 
+                user.Email, 
+                user.Password, 
+                user.Settings.PomodoroWorkInterval, 
+                user.Settings.PomodoroBreakInterval,
+                user.Settings.PomodoroIntervalsCount), 
+            statistics);
     }
 
     public async Task<Data[]> GetStatistics(User user)
@@ -134,20 +142,17 @@ public class UserService : IUserService
     }
 
     public async Task<UpdatedUserResponse> UpdateUser(
-        UserRequest user, 
+        UserDto user, 
         int userId)
     {
         var existingUser = await repository.GetById(userId);
 
         existingUser.Name = user.name;
         existingUser.Email = user.email;
-        existingUser.Password = passwordHasher.Generate(user.pasword);
-        existingUser.Settings = new UserSettings()
-        {
-            PomodoroWorkInterval = user.workInterval,
-            PomodoroBreakInterval = user.breakInterval,
-            PomodoroIntervalsCount = user.intervalsCount,
-        };
+        existingUser.Settings.PomodoroWorkInterval = user.workInterval;
+        existingUser.Settings.PomodoroBreakInterval = user.breakInterval;
+        existingUser.Settings.PomodoroIntervalsCount = user.intervalsCount;
+        
         existingUser.LastUpdatedAt = DateTime.UtcNow;
 
         await repository.Update(existingUser);

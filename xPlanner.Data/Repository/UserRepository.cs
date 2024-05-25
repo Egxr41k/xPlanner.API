@@ -37,6 +37,12 @@ public class UserRepository : IRepository<User>
     public async Task<User> Add(User user)
     {
         await dbContext.Users.AddAsync(user);
+        await dbContext.SaveChangesAsync();
+
+        user.Settings.Id = dbContext.Users
+            .FirstOrDefault(existingUser => existingUser.Email == user.Email)?.Id ?? 
+            user.Id;
+
         await dbContext.UsersSettings.AddAsync(user.Settings);
         await dbContext.SaveChangesAsync();
 
