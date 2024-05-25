@@ -16,10 +16,45 @@ public class PomodoroSessionRepository : IRepository<PomodoroSession>
     public async Task<PomodoroSession> Add(PomodoroSession session)
     {
         await dbContext.PomodoroSessions.AddAsync(session);
-        await dbContext.PomodoroRounds.AddRangeAsync(session.Rounds);
+        await dbContext.SaveChangesAsync();
+
+        session = dbContext.PomodoroSessions
+            .FirstOrDefault(session => session.CreatedAt.Day == DateTime.Today.Day)!;
+
+        var rounds = await CreateRounds(session);
+        await dbContext.PomodoroRounds.AddRangeAsync(rounds);
+
+        rounds = await dbContext.PomodoroRounds
+            .Where(round => round.SessionId == session.Id)
+            .OrderBy(round => round.Id)
+            .ToListAsync();
+
+        session.Rounds = rounds;
+
         await dbContext.SaveChangesAsync();
 
         return session;
+    }
+
+    public async Task<List<PomodoroRound>> CreateRounds(PomodoroSession session)
+    {
+        var settings = await dbContext.UsersSettings
+            .FirstOrDefaultAsync(settings => settings.UserId == session.UserId);
+
+        var roundsCount = settings?.PomodoroIntervalsCount ?? 0;
+        var rounds = new List<PomodoroRound>();
+
+        for (int i = 0; i < roundsCount; i++)
+        {
+            rounds.Add(new PomodoroRound
+            {
+                SessionId = session.Id,
+                CreatedAt = DateTime.UtcNow,
+                LastUpdatedAt = DateTime.UtcNow
+            });
+        }
+
+        return rounds;
     }
 
     public async Task<PomodoroSession> Delete(int id)

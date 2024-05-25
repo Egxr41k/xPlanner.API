@@ -46,17 +46,11 @@ public class PomodoroService : IPomodoroService
         var session = new PomodoroSession()
         {
             UserId = userId,
-            //Rounds = CreateOrderedRounds(user?.Settings?.PomodoroIntervalsCount ?? 6),
             IsCompleted = false,
             CreatedAt = DateTime.UtcNow,
         };
 
         return await repository.Add(session);
-    }
-
-    private List<PomodoroRound> CreateOrderedRounds(int length)
-    {
-        return new PomodoroRound[length].ToList();
     }
 
     public async Task<PomodoroSession> UpdateSession(
