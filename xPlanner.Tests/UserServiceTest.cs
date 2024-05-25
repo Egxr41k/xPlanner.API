@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using xPlanner.Auth;
 using xPlanner.Data.Repository;
 using xPlanner.Domain.Entities;
@@ -28,7 +26,7 @@ namespace xPlanner.Tests
                 Id = ExistingUserId,
                 CreatedAt = DateTime.UtcNow,
                 Email = "testEmail@test.com",
-                Name = "testEmail@test.com", 
+                Name = "testEmail@test.com",
                 Password = hasher.Generate("password")
             });
             dbContext.SaveChanges();
