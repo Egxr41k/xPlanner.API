@@ -13,8 +13,8 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> RegisterHandler(
-        AuthRequest request, 
-        AuthService service, 
+        AuthRequest request,
+        IAuthService service, 
         HttpContext context)
     {
         var result = await service.Register(request, context);
@@ -22,8 +22,8 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> LoginHandler(
-        AuthRequest request, 
-        AuthService service, 
+        AuthRequest request,
+        IAuthService service, 
         HttpContext context)
     {
         var result = await service.Login(request, context);
@@ -31,7 +31,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> AccessTokenHandler(
-        AuthService service,
+        IAuthService service,
         HttpContext context)
     {
         var result = await service.RefreshAccessToken(context);
@@ -39,7 +39,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> LogoutHandler(
-        AuthService service, 
+        IAuthService service, 
         HttpContext context)
     {
         await service.Logout(context);

@@ -15,7 +15,7 @@ public static class UserTaskEndpoints
     private static async Task<IResult> DeleteTask(
         int id,
         HttpContext context,
-        UserTaskService service)
+        IUserTaskService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -27,7 +27,7 @@ public static class UserTaskEndpoints
         int id,
         UserTaskRequest userTask,
         HttpContext context,
-        UserTaskService service)
+        IUserTaskService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -38,7 +38,7 @@ public static class UserTaskEndpoints
     private static async Task<IResult> CreateTask(
         UserTaskRequest userTask,
         HttpContext context,
-        UserTaskService service)
+        IUserTaskService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -48,7 +48,7 @@ public static class UserTaskEndpoints
 
     private static async Task<IResult> GetTasks(
         HttpContext context,
-        UserTaskService service)
+        IUserTaskService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 

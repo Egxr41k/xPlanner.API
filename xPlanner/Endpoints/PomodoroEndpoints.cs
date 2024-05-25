@@ -17,7 +17,7 @@ public static class PomodoroEndpoints
     private static async Task<IResult> DeleteSession(
         int id,
         HttpContext context,
-        PomodoroService service)
+        IPomodoroService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -28,7 +28,7 @@ public static class PomodoroEndpoints
     private static async Task<IResult> UpdateSession(
         int id,
         HttpContext context,
-        PomodoroService service,
+        IPomodoroService service,
         PomodoroSessionRequest session)
     {
         var userId = Helpers.GetUserIdFromContext(context);
@@ -39,8 +39,8 @@ public static class PomodoroEndpoints
 
     private static async Task<IResult> UpdateRound(
         int id,
-        HttpContext context, 
-        PomodoroService service,
+        HttpContext context,
+        IPomodoroService service,
         PomodoroRoundRequest round)
     {
         var userId = Helpers.GetUserIdFromContext(context);
@@ -51,7 +51,7 @@ public static class PomodoroEndpoints
 
     private static async Task<IResult> CreateSession(
         HttpContext context,
-        PomodoroService service)
+        IPomodoroService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 
@@ -61,7 +61,7 @@ public static class PomodoroEndpoints
 
     private static async Task<IResult> GetTodaySession(
         HttpContext context,
-        PomodoroService service)
+        IPomodoroService service)
     {
         var userId = Helpers.GetUserIdFromContext(context);
 

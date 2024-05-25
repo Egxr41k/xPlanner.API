@@ -62,7 +62,7 @@ builder.Services.AddScoped<IRepository<UserTask>, UserTaskRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPomodoroService, PomodoroService>();
 builder.Services.AddScoped<ITimeBlockService, TimeBlockService>();
-builder.Services.AddScoped<IUserService, UserService > ();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserTaskService, UserTaskService>();
 
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
